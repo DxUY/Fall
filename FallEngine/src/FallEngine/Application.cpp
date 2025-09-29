@@ -16,11 +16,24 @@ namespace FallEngine {
 	Application::~Application() {
 	}
 
+	void Application::PushLayer(Layer* layer) {
+		m_layerStack.PushLayer(layer);
+	}
+
+	void Application::PushOverlay(Layer* overlay) {
+		m_layerStack.PushOverlay(overlay);
+	}
+
     void Application::OnEvent(Event& e) {
 		EventDispatcher dispatcher(e);
-
 		dispatcher.Dispatch<WindowCloseEvent>(BIND_EVENT_FN(OnWindowClose));
-    }
+    
+		for(auto it = m_layerStack.end(); it != m_layerStack.begin();) {
+			(*--it)->OnEvent(e);
+			if (e.IsHandled())
+				break;
+		}
+	}
 
 	bool Application::OnWindowClose(WindowCloseEvent& e) {
 		m_Running = false;

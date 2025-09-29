@@ -15,7 +15,7 @@ add_library(FallEngine SHARED
     "src/FallEngine/Window.h" 
     "src/Platform/Windows/WindowsWindow.h" 
     "src/Platform/Windows/WindowsWindow.cpp"
-)
+ "src/FallEngine/Layer.h" "src/FallEngine/Layer.cpp" "src/FallEngine/LayerStack.cpp" "src/FallEngine/LayerStack.h")
 
 # Define platform and build type
 target_compile_definitions(FallEngine PRIVATE 
