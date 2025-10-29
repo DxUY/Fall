@@ -1,11 +1,11 @@
 #pragma once
 
-#include "Core.h"
+#include "Base.h"
 #include "Events/Event.h"
 
 namespace FallEngine {
 
-	class FALL_API Layer {
+	class  Layer {
 	public:
 		Layer(const std::string& name = "Layer");
 		virtual ~Layer();
@@ -14,6 +14,8 @@ namespace FallEngine {
 		virtual void OnDetach() {}
 		virtual void OnUpdate() {}
 		virtual void OnEvent(Event& event) {}
+
+		virtual void OnImGuiRender() {}
 
 		inline const std::string& GetName() const { return m_DebugName; }
 	protected:

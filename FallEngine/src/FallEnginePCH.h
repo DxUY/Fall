@@ -1,5 +1,11 @@
 #pragma once
 
+#ifdef FALL_PLATFORM_WINDOWS
+	#ifndef NOMINMAX
+		#define NOMINMAX
+	#endif
+#endif
+
 #include <iostream>
 #include <memory>
 #include <utility>
@@ -12,6 +18,8 @@
 #include <unordered_map>
 #include <unordered_set>
 
-#ifdef F_PLATFORM_WINDOWS
-#include <Windows.h>
+#include "FallEngine/Core/Base.h"
+
+#ifdef FALL_PLATFORM_WINDOWS
+	#include <Windows.h>
 #endif

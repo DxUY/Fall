@@ -4,7 +4,7 @@
 
 namespace FallEngine
 {
-	class FALL_API EventQueue
+	class  EventQueue
 	{
 	public:
 		// Submit an event to the buffer
@@ -38,7 +38,7 @@ namespace FallEngine
 		std::vector<std::unique_ptr<Event>> m_EventBuffer;
 	};
 
-	class FALL_API EventBus
+	class  EventBus
 	{
 	public:
 		static EventBus& Get()

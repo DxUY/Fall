@@ -1,14 +1,18 @@
 #pragma once
 
-#include "Core.h"
+#include "Base.h"
 
 #include "Window.h"
 #include "LayerStack.h"
 #include "Events/Event.h"
 #include "Events/ApplicationEvent.h"
 
+#include "FallEngine/ImGui/ImGuiLayer.h"
+
+#include "TimeStep.h"
+
 namespace FallEngine {
-	class FALL_API Application
+	class  Application
 	{
 	public:
 		Application();
@@ -20,12 +24,19 @@ namespace FallEngine {
 
 		void PushLayer(Layer* layer);
 		void PushOverlay(Layer* overlay);
+		
+		inline static Application& Get() { return *s_Instance; }
+		inline Window& GetWindow() { return *m_Window; }
 	private:
 		bool OnWindowClose(WindowCloseEvent& e);
 
-		std::unique_ptr<Window> m_Window;
+		Scope<Window> m_Window;
+		ImGuiLayer* m_ImGuiLayer;
 		bool m_Running = true;
+
 		LayerStack m_layerStack;
+	private:
+		static Application* s_Instance;
 	};
 
 	//to be defined in CLIENT

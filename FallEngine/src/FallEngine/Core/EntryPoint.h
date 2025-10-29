@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef F_PLATFORM_WINDOWS
+#ifdef FALL_PLATFORM_WINDOWS
 
 extern FallEngine::Application* FallEngine::CreateApplication();
 

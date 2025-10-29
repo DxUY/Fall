@@ -1,12 +1,9 @@
 #pragma once
 
-#include "FallEngine/Window.h"
+#include "FallEngine/Core/Window.h"
 #include <SDL3/SDL.h>
-#include <string>
 
-#include "FallEngine/Events/ApplicationEvent.h"
-#include "FallEngine/Events/KeyEvent.h"
-#include "FallEngine/Events/MouseEvent.h"
+#include "FallEngine/Renderer/GraphicsContext.h"
 
 namespace FallEngine {
 
@@ -24,7 +21,8 @@ namespace FallEngine {
 		void SetVSync(bool enabled) override;
 		bool IsVSync() const override { return m_Data.VSync; }
 
-		// === New mouse query functions ===
+		inline virtual void* GetNativeWindow() const override { return m_Window; }
+
 		std::pair<float, float> GetMousePos() const;
 		std::pair<float, float> GetMouseDelta() const;
 
@@ -32,17 +30,20 @@ namespace FallEngine {
 		void Init(const WindowProps& props);
 		void Shutdown();
 
+		void PollEvents();							 
+		void ProcessEvent(const SDL_Event& event);   
+
 	private:
-		SDL_Window* m_Window = nullptr;
-		SDL_GLContext m_Context = nullptr;
+		SDL_Window* m_Window;
+		Scope<GraphicsContext> m_Context;
 
 		struct WindowData {
-			std::string Title = "Untitled";
-			unsigned int Width = 800;
-			unsigned int Height = 600;
+			std::string Title;
+			unsigned int Width = 1280;
+			unsigned int Height = 720;
 			bool VSync = true;
 
-			EventCallBackFn EventCallBack = nullptr;
+			EventCallBackFn EventCallBack;
 
 			// Mouse state tracking
 			float MouseX = 0.0f, MouseY = 0.0f;

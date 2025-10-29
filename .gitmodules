@@ -1,0 +1,35 @@
+[submodule "FallEngine/vendor/spdlog"]
+	path = FallEngine/vendor/spdlog
+	url = https://github.com/gabime/spdlog.git
+[submodule "FallEngine/vendor/vendor/SDL3"]
+	path = FallEngine/vendor/vendor/SDL3
+	url = https://github.com/libsdl-org/SDL.git
+[submodule "FallEngine/vendor/vendor/glm"]
+	path = FallEngine/vendor/vendor/glm
+	url = https://github.com/g-truc/glm.git
+[submodule "FallEngine/vendor/SDL3"]
+	path = FallEngine/vendor/SDL3
+	url = https://github.com/libsdl-org/SDL.git
+[submodule "FallEngine/vendor/glm"]
+	path = FallEngine/vendor/glm
+	url = https://github.com/g-truc/glm.git
+[submodule "vendor/imgui"]
+	path = vendor/imgui
+	url = https://github.com/ocornut/imgui.git
+	branch = docking
+[submodule "vendor/vulkan/Vulkan-Headers"]
+	path = vendor/vulkan/Vulkan-Headers
+	url = https://github.com/KhronosGroup/Vulkan-Headers.git
+[submodule "FallEngine/vendor/imgui"]
+	path = FallEngine/vendor/imgui
+	url = https://github.com/ocornut/imgui.git
+	branch = docking
+[submodule "FallEngine/vendor/vulkan/Vulkan-Headers"]
+	path = FallEngine/vendor/vulkan/Vulkan-Headers
+	url = https://github.com/KhronosGroup/Vulkan-Headers.git
+[submodule "FallEngine/vendor/vulkan/Vulkan-Loader"]
+	path = FallEngine/vendor/vulkan/Vulkan-Loader
+	url = https://github.com/KhronosGroup/Vulkan-Loader.git
+[submodule "FallEngine/vendor/FallEngine/vendor/spdlog"]
+	path = FallEngine/vendor/FallEngine/vendor/spdlog
+	url = https://github.com/gabime/spdlog.git

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "FallEngine/Core.h"
 #include "FallEnginePCH.h"
 
 namespace FallEngine
@@ -32,7 +31,7 @@ namespace FallEngine
 #define EVENT_CLASS_CATEGORY(category) \
 	int GetCategoryFlags() const override { return static_cast<int>(category); }
 
-	class FALL_API Event
+	class  Event
 	{
 	protected:
 		bool m_Handled = false;
@@ -54,7 +53,7 @@ namespace FallEngine
 		virtual ~Event() = default;
 	};
 
-	class FALL_API EventDispatcher
+	class  EventDispatcher
 	{
 	public:
 		EventDispatcher(Event& event)
