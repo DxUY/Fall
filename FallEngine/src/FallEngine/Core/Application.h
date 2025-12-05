@@ -6,9 +6,6 @@
 #include "LayerStack.h"
 #include "Events/Event.h"
 #include "Events/ApplicationEvent.h"
-
-#include "FallEngine/ImGui/ImGuiLayer.h"
-
 #include "TimeStep.h"
 
 namespace FallEngine {
@@ -31,7 +28,6 @@ namespace FallEngine {
 		bool OnWindowClose(WindowCloseEvent& e);
 
 		Scope<Window> m_Window;
-		ImGuiLayer* m_ImGuiLayer;
 		bool m_Running = true;
 
 		LayerStack m_layerStack;

@@ -10,7 +10,5 @@
 #include "FallEngine/Core/KeyCodes.h"
 #include "FallEngine/Core/MouseCodes.h"
 
-#include "FallEngine/ImGui/ImGuiLayer.h"
-
 // ----------------------------------------------- ENTRY POINT ------------------------------------------------------------//
 #include "FallEngine/Core/EntryPoint.h"

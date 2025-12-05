@@ -1,16 +1,16 @@
 #pragma once
 
 #include "FallEngine/Core/Window.h"
-#include <SDL3/SDL.h>
-
 #include "FallEngine/Renderer/GraphicsContext.h"
+
+#include <SDL3/SDL.h>
 
 namespace FallEngine {
 
-	class WindowsWindow : public Window {
+	class SdlWindow : public Window {
 	public:
-		WindowsWindow(const WindowProps& props);
-		virtual ~WindowsWindow();
+		SdlWindow(const WindowProps& props);
+		virtual ~SdlWindow();
 
 		void OnUpdate() override;
 
@@ -45,7 +45,6 @@ namespace FallEngine {
 
 			EventCallBackFn EventCallBack;
 
-			// Mouse state tracking
 			float MouseX = 0.0f, MouseY = 0.0f;
 			float LastMouseX = 0.0f, LastMouseY = 0.0f;
 			float DeltaX = 0.0f, DeltaY = 0.0f;

@@ -10,9 +10,6 @@ namespace FallEngine {
 
 		m_Window = Scope<Window>(Window::Create());
 		m_Window->SetEventCallBack(FALL_BIND_EVENT_FN(OnEvent));
-
-		m_ImGuiLayer = new ImGuiLayer();
-		PushOverlay(m_ImGuiLayer);
 	}
 
 	Application::~Application() {
@@ -48,11 +45,6 @@ namespace FallEngine {
 		while (m_Running) {
 			for (Layer* layer : m_layerStack)
 				layer->OnUpdate();
-
-			m_ImGuiLayer->Begin();
-			for (Layer* layer : m_layerStack)
-				layer->OnImGuiRender();
-			m_ImGuiLayer->End();
 
 			m_Window->OnUpdate();
 		}

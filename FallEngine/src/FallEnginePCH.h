@@ -4,6 +4,8 @@
 	#ifndef NOMINMAX
 		#define NOMINMAX
 	#endif
+
+	#define WIN32_LEAN_AND_MEAN
 #endif
 
 #include <iostream>
@@ -11,10 +13,10 @@
 #include <utility>
 #include <algorithm>
 #include <functional>
+#include <limits>
 
 #include <string>
 #include <sstream>
-#include <vector>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -22,4 +24,11 @@
 
 #ifdef FALL_PLATFORM_WINDOWS
 	#include <Windows.h>
+
+	#ifdef min
+		#undef min
+	#endif
+	#ifdef max
+		#undef max
+	#endif
 #endif

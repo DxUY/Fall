@@ -7,4 +7,3 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 add_subdirectory(FallEngine)
 add_subdirectory(Editor)
-add_subdirectory(Math)

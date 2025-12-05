@@ -6,6 +6,5 @@ namespace FallEngine {
 		: m_DebugName(name) {
 	}
 
-	Layer::~Layer() {
-	}
+	Layer::~Layer() {}
 }

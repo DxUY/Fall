@@ -4,7 +4,8 @@
 #include "Layer.h"
 
 namespace FallEngine {
-	class  LayerStack {
+	class  LayerStack 
+	{
 	public:
 		LayerStack();
 		~LayerStack();

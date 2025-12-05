@@ -1,27 +1,26 @@
-#include "WindowsWindow.h"
+#include "SdlWindow.h"
 
 #include "FallEngine/Events/ApplicationEvent.h"
 #include "FallEngine/Events/KeyEvent.h"
 #include "FallEngine/Events/MouseEvent.h"
-#include <SDL3/SDL.h>
 
 namespace FallEngine {
 
 	static bool s_SDLInitialized = false;
 
 	Window* Window::Create(const WindowProps& props) {
-		return new WindowsWindow(props);
+		return new SdlWindow(props);
 	}
 
-	WindowsWindow::WindowsWindow(const WindowProps& props) {
+	SdlWindow::SdlWindow(const WindowProps& props) {
 		Init(props);
 	}
 
-	WindowsWindow::~WindowsWindow() {
+	SdlWindow::~SdlWindow() {
 		Shutdown();
 	}
 
-	void WindowsWindow::Init(const WindowProps& props) {
+	void SdlWindow::Init(const WindowProps& props) {
 		m_Data.Title = props.Title;
 		m_Data.Width = props.Width;
 		m_Data.Height = props.Height;
@@ -38,20 +37,20 @@ namespace FallEngine {
 			s_SDLInitialized = true;
 		}
 
-		m_Window = SDL_CreateWindow(m_Data.Title.c_str(), m_Data.Width, m_Data.Height, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+		m_Window = SDL_CreateWindow(m_Data.Title.c_str(), m_Data.Width, m_Data.Height, SDL_WINDOW_RESIZABLE);
 		FALL_CORE_ASSERT(m_Window != nullptr, "Failed to create SDL window: {0}", SDL_GetError());
 
-		m_Context = GraphicsContext::Create(m_Window);
+		m_Context = CreateScope<GraphicsContext>(m_Window);
 		m_Context->Init();
 
 		SetVSync(true);
 	}
 
-	void WindowsWindow::Shutdown() {
+	void SdlWindow::Shutdown() {
 		
 	}
 
-	void WindowsWindow::PollEvents() {
+	void SdlWindow::PollEvents() {
 		SDL_Event event;
 		while (SDL_PollEvent(&event)) {
 			/*ImGui_ImplSDL3_ProcessEvent(&event);*/
@@ -59,7 +58,7 @@ namespace FallEngine {
 		}
 	}
 
-	void WindowsWindow::ProcessEvent(const SDL_Event& event) {
+	void SdlWindow::ProcessEvent(const SDL_Event& event) {
 		switch (event.type) {
 		case SDL_EVENT_QUIT: {
 			if (m_Data.EventCallBack) {
@@ -135,24 +134,16 @@ namespace FallEngine {
 		}
 	}
 
-	void WindowsWindow::OnUpdate() {
+	void SdlWindow::OnUpdate() {
 		m_Data.DeltaX = 0.0f;
 		m_Data.DeltaY = 0.0f;
 
-		PollEvents();            
+		PollEvents();
 		m_Context->SwapBuffers();
 	}
 
-	void WindowsWindow::SetVSync(bool enabled) {
+	void SdlWindow::SetVSync(bool enabled) {
 		
-	}
-
-	std::pair<float, float> WindowsWindow::GetMousePos() const {
-		return { m_Data.MouseX, m_Data.MouseY };
-	}
-
-	std::pair<float, float> WindowsWindow::GetMouseDelta() const {
-		return { m_Data.DeltaX, m_Data.DeltaY };
 	}
 
 }
