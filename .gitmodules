@@ -11,3 +11,6 @@
 	path = FallEngine/vendor/imgui
 	url = https://github.com/ocornut/imgui.git
 	branch = docking
+[submodule "FallEngine/vendor/shadercross"]
+	path = FallEngine/vendor/shadercross
+	url = https://github.com/libsdl-org/SDL_shadercross.git
