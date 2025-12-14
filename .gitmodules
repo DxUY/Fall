@@ -11,3 +11,6 @@
 	path = FallEngine/vendor/imgui
 	url = https://github.com/ocornut/imgui.git
 	branch = docking
+[submodule "FallEngine/vendor/VulkanMemoryAllocator"]
+	path = FallEngine/vendor/VulkanMemoryAllocator
+	url = https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator
