@@ -1,6 +1,5 @@
 #include "FallEnginePCH.h"
 #include "Utils/PlatformUtils.h"
-#include "Core/Application.h"
 
 #include <SDL3/SDL.h>
 #include <SDL3/SDL_dialog.h>

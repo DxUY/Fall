@@ -1,12 +1,14 @@
 #include "SdlWindow.h"
 
-#include "FallEngine/Events/ApplicationEvent.h"
-#include "FallEngine/Events/KeyEvent.h"
-#include "FallEngine/Events/MouseEvent.h"
+#include "Core/Input.h"
+
+#include "Events/ApplicationEvent.h"
+#include "Events/KeyEvent.h"
+#include "Events/MouseEvent.h"
 
 namespace FallEngine {
 
-	static bool s_SDLInitialized = false;
+	static uint8_t s_SDLWindowCount = 0;
 
 	Window* Window::Create(const WindowProps& props) {
 		return new SdlWindow(props);
@@ -31,23 +33,27 @@ namespace FallEngine {
 		m_Data.LastMouseX = m_Data.LastMouseY = 0.0f;
 		m_Data.DeltaX = m_Data.DeltaY = 0.0f;
 
-		if (!s_SDLInitialized) {
+		if (s_SDLWindowCount == 0) {
 			int result = SDL_Init(SDL_INIT_VIDEO);
 			FALL_CORE_ASSERT(result == 0, "Failed to initialize SDL: {0}", SDL_GetError());
-			s_SDLInitialized = true;
 		}
 
-		m_Window = SDL_CreateWindow(m_Data.Title.c_str(), m_Data.Width, m_Data.Height, SDL_WINDOW_RESIZABLE);
-		FALL_CORE_ASSERT(m_Window != nullptr, "Failed to create SDL window: {0}", SDL_GetError());
-
-		m_Context = CreateScope<GraphicsContext>(m_Window);
-		m_Context->Init();
+		{
+		#if defined(FALL_DEBUG)
+		
+		#endif
+			m_Window = SDL_CreateWindow(m_Data.Title.c_str(), m_Data.Width, m_Data.Height, SDL_WINDOW_RESIZABLE);
+			++s_SDLWindowCount;
+		}
 
 		SetVSync(true);
 	}
 
 	void SdlWindow::Shutdown() {
-		
+		SDL_DestroyWindow(m_Window);
+		--s_SDLWindowCount;
+
+		if (s_SDLWindowCount == 0) SDL_Quit();
 	}
 
 	void SdlWindow::PollEvents() {
@@ -139,7 +145,6 @@ namespace FallEngine {
 		m_Data.DeltaY = 0.0f;
 
 		PollEvents();
-		m_Context->SwapBuffers();
 	}
 
 	void SdlWindow::SetVSync(bool enabled) {

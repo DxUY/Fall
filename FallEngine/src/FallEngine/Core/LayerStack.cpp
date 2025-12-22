@@ -1,7 +1,9 @@
-#include "LayerStack.h"
 #include "FallEnginePCH.h"
+#include "LayerStack.h"
+#include "Layer.h"
 
 namespace FallEngine {
+
 	LayerStack::LayerStack() {}
 
 	LayerStack::~LayerStack() {
@@ -33,4 +35,5 @@ namespace FallEngine {
 			m_Layers.erase(it);
 		}
 	}
+
 }

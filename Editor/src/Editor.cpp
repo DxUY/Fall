@@ -5,7 +5,6 @@ class Editor : public FallEngine::Application
 public:
 	Editor() 
 	{
-		
 	}
 
 	~Editor() {}

@@ -1,40 +1,39 @@
 #pragma once
 
 #include "Base.h"
-
-#include "Window.h"
 #include "LayerStack.h"
-#include "Events/Event.h"
-#include "Events/ApplicationEvent.h"
-#include "TimeStep.h"
 
 namespace FallEngine {
-	class  Application
-	{
-	public:
-		Application();
-		virtual ~Application();
 
-		void Run();
+    class Window;
+    class Event;
+    class WindowCloseEvent;
 
-		void OnEvent(Event& e);
+    class Application {
+    public:
+        Application();
+        virtual ~Application();
 
-		void PushLayer(Layer* layer);
-		void PushOverlay(Layer* overlay);
-		
-		inline static Application& Get() { return *s_Instance; }
-		inline Window& GetWindow() { return *m_Window; }
-	private:
-		bool OnWindowClose(WindowCloseEvent& e);
+        void Run();
+        void OnEvent(Event& e);
 
-		Scope<Window> m_Window;
-		bool m_Running = true;
+        void PushLayer(Layer* layer);
+        void PushOverlay(Layer* overlay);
 
-		LayerStack m_layerStack;
-	private:
-		static Application* s_Instance;
-	};
+        static Application& Get() { return *s_Instance; }
+        Window& GetWindow();
 
-	//to be defined in CLIENT
-	Application* CreateApplication();
+    private:
+        bool OnWindowClose(WindowCloseEvent& e);
+
+        Scope<Window> m_Window;
+        bool m_Running = true;
+        LayerStack m_layerStack;
+
+        static Application* s_Instance;
+    };
+
+    // To be defined in CLIENT
+    Application* CreateApplication();
+
 }

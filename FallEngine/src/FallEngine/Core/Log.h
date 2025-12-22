@@ -4,17 +4,18 @@
 #include "spdlog/spdlog.h"
 
 namespace FallEngine {
-	class Log
-	{
+
+	class Log {
 	public:
 		static void Init();
 
-		inline static std::shared_ptr<spdlog::logger>& GetCoreLogger() { return s_CoreLogger; }
-		inline static std::shared_ptr<spdlog::logger>& GetClientLogger() { return s_ClientLogger; }
+		inline static Ref<spdlog::logger>& GetCoreLogger() { return s_CoreLogger; }
+		inline static Ref<spdlog::logger>& GetClientLogger() { return s_ClientLogger; }
 	private:
-		static std::shared_ptr<spdlog::logger> s_CoreLogger;
-		static std::shared_ptr<spdlog::logger> s_ClientLogger;
+		static Ref<spdlog::logger> s_CoreLogger;
+		static Ref<spdlog::logger> s_ClientLogger;
 	};
+
 }
 
 #define FALL_CORE_TRACE(...)		::FallEngine::Log::GetCoreLogger()->trace(__VA_ARGS__)

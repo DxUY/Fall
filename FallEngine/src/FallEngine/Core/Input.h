@@ -6,6 +6,7 @@
 #include <glm/glm.hpp>
 
 namespace FallEngine {
+
 	class Input {
     public:
         static bool IsKeyPressed(KeyCode key);

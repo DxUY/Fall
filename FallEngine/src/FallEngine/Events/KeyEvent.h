@@ -2,10 +2,9 @@
 
 #include "Event.h"
 
-namespace FallEngine
-{
-	class  KeyEvent : public Event
-	{
+namespace FallEngine {
+
+	class  KeyEvent : public Event {
 	public:
 		inline int GetKeyCode() const { return m_KeyCode; }
 		
@@ -53,4 +52,5 @@ namespace FallEngine
 
 		EVENT_CLASS_TYPE(KeyReleased)
 	};
+
 }

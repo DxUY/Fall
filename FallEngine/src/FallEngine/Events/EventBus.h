@@ -1,11 +1,12 @@
 #pragma once
 
 #include "Event.h"
+#include "Base.h"
+#include <vector>
 
-namespace FallEngine
-{
-	class  EventQueue
-	{
+namespace FallEngine {
+
+	class  EventQueue {
 	public:
 		// Submit an event to the buffer
 		void Submit(std::unique_ptr<Event> event)
@@ -35,11 +36,10 @@ namespace FallEngine
 		}
 
 	private:
-		std::vector<std::unique_ptr<Event>> m_EventBuffer;
+		std::vector<Scope<Event>> m_EventBuffer;
 	};
 
-	class  EventBus
-	{
+	class  EventBus {
 	public:
 		static EventBus& Get()
 		{
@@ -66,4 +66,5 @@ namespace FallEngine
 	private:
 		EventQueue m_MainQueue;
 	};
+
 }

@@ -1,7 +1,6 @@
 #include "FallEnginePCH.h"
 
 #include "FallEngine/Core/Input.h"
-#include "FallEngine/Core/Application.h"
 
 #include <SDL3/SDL.h>
 
@@ -9,14 +8,12 @@ namespace FallEngine {
 
     bool Input::IsKeyPressed(KeyCode key)
     {
-        auto* window = static_cast<SDL_Window*>(Application::Get().GetWindow().GetNativeWindow());
         const bool* state = SDL_GetKeyboardState(nullptr);
         return state[key] != 0;
     }
 
     bool Input::IsMouseButtonPressed(MouseCode button)
     {
-        auto* window = static_cast<SDL_Window*>(Application::Get().GetWindow().GetNativeWindow());
         Uint32 buttons = SDL_GetMouseState(nullptr, nullptr);
         return (buttons & SDL_BUTTON_MASK(static_cast<int>(button))) != 0;
     }

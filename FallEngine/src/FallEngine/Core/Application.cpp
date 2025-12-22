@@ -1,52 +1,66 @@
-#include "Application.h"
 #include "FallEnginePCH.h"
+#include "Application.h"
+
+#include "Window.h"
+#include "Events/Event.h"
+#include "Events/ApplicationEvent.h"
+#include "Layer.h"
 
 namespace FallEngine {
-	Application* Application::s_Instance = nullptr;
-	
-	Application::Application() {
-		FALL_CORE_ASSERT(!s_Instance, "Application already exists!");
-		s_Instance = this;
 
-		m_Window = Scope<Window>(Window::Create());
-		m_Window->SetEventCallBack(FALL_BIND_EVENT_FN(OnEvent));
-	}
+    Application* Application::s_Instance = nullptr;
 
-	Application::~Application() {
-	}
+    Application::Application() {
+        FALL_CORE_ASSERT(!s_Instance, "Application already exists!");
+        s_Instance = this;
 
-	void Application::PushLayer(Layer* layer) {
-		m_layerStack.PushLayer(layer);
-		layer->OnAttach();
-	}
+        m_Window = Scope<Window>(Window::Create());
+        m_Window->SetEventCallback(FALL_BIND_EVENT_FN(OnEvent));
 
-	void Application::PushOverlay(Layer* overlay) {
-		m_layerStack.PushOverlay(overlay);
-		overlay->OnAttach();
-	}
+    }
+
+    Application::~Application() {}
+
+    Window& Application::GetWindow() {
+        return *m_Window;
+    }
+
+    void Application::PushLayer(Layer* layer) {
+        m_layerStack.PushLayer(layer);
+        layer->OnAttach();
+    }
+
+    void Application::PushOverlay(Layer* overlay) {
+        m_layerStack.PushOverlay(overlay);
+        overlay->OnAttach();
+    }
 
     void Application::OnEvent(Event& e) {
-		EventDispatcher dispatcher(e);
-		dispatcher.Dispatch<WindowCloseEvent>(FALL_BIND_EVENT_FN(OnWindowClose));
-    
-		for(auto it = m_layerStack.end(); it != m_layerStack.begin();) {
-			(*--it)->OnEvent(e);
-			if (e.IsHandled())
-				break;
-		}
-	}
+        EventDispatcher dispatcher(e);
+        dispatcher.Dispatch<WindowCloseEvent>(FALL_BIND_EVENT_FN(OnWindowClose));
 
-	bool Application::OnWindowClose(WindowCloseEvent& e) {
-		m_Running = false;
-		return true;
-	}
+        for (auto it = m_layerStack.end(); it != m_layerStack.begin();) {
+            (*--it)->OnEvent(e);
+            if (e.IsHandled())
+                break;
+        }
+    }
 
-	void Application::Run() {
-		while (m_Running) {
-			for (Layer* layer : m_layerStack)
-				layer->OnUpdate();
+    bool Application::OnWindowClose(WindowCloseEvent&) {
+        m_Running = false;
+        return true;
+    }
 
-			m_Window->OnUpdate();
-		}
-	}
+    void Application::Run()
+    {
+        while (m_Running)
+        {
+            // --- Update layers ---
+            for (Layer* layer : m_layerStack)
+                layer->OnUpdate();
+
+            m_Window->OnUpdate();
+        }
+    }
+
 }

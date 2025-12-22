@@ -1,9 +1,10 @@
 #pragma once
 
 #include "FallEngine/Core/Window.h"
-#include "FallEngine/Renderer/GraphicsContext.h"
 
-#include <SDL3/SDL.h>
+#include "SDL3/SDL.h"
+
+struct SDL_Window;
 
 namespace FallEngine {
 
@@ -17,7 +18,7 @@ namespace FallEngine {
 		unsigned int GetWidth() const override { return m_Data.Width; }
 		unsigned int GetHeight() const override { return m_Data.Height; }
 
-		void SetEventCallBack(const EventCallBackFn& callback) override { m_Data.EventCallBack = callback; }
+		void SetEventCallback(const EventCallbackFn& callback) override { m_Data.EventCallBack = callback; }
 		void SetVSync(bool enabled) override;
 		bool IsVSync() const override { return m_Data.VSync; }
 
@@ -30,12 +31,11 @@ namespace FallEngine {
 		void Init(const WindowProps& props);
 		void Shutdown();
 
-		void PollEvents();							 
+		void PollEvents();
 		void ProcessEvent(const SDL_Event& event);   
 
 	private:
 		SDL_Window* m_Window;
-		Scope<GraphicsContext> m_Context;
 
 		struct WindowData {
 			std::string Title;
@@ -43,7 +43,7 @@ namespace FallEngine {
 			unsigned int Height = 720;
 			bool VSync = true;
 
-			EventCallBackFn EventCallBack;
+			EventCallbackFn EventCallBack;
 
 			float MouseX = 0.0f, MouseY = 0.0f;
 			float LastMouseX = 0.0f, LastMouseY = 0.0f;

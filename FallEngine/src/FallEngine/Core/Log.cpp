@@ -5,6 +5,7 @@
 #include <spdlog/sinks/basic_file_sink.h>
 
 namespace FallEngine {
+
 	Ref<spdlog::logger> Log::s_CoreLogger;
 	Ref<spdlog::logger> Log::s_ClientLogger;
 
@@ -27,4 +28,5 @@ namespace FallEngine {
 		s_ClientLogger->set_level(spdlog::level::trace);
 		s_ClientLogger->flush_on(spdlog::level::trace);
 	}
+
 }

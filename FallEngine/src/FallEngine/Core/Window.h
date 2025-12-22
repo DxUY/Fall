@@ -1,38 +1,32 @@
-#pragma once 
+#pragma once
 
-#include "FallEnginePCH.h"
-
-#include "Base.h"
 #include "Events/Event.h"
 
 namespace FallEngine {
-	struct WindowProps 
-	{
-		const char* Title;
-		unsigned int Width;
-		unsigned int Height;
-		
-		WindowProps(const char* title = "FallEngine Window", unsigned int width = 1280, unsigned int height = 720)
-			: Title(title), Width(width), Height(height) {}
-	};
 
-	class Window
-	{
-	public:
-		using EventCallBackFn = std::function<void(Event&)>;
+    struct WindowProps {
+        const char* Title = "FallEngine";
+        uint32_t Width = 1280;
+        uint32_t Height = 720;
+    };
 
-		virtual ~Window() {}
-		virtual void OnUpdate() = 0;
+    class Window {
+    public:
+        using EventCallbackFn = std::function<void(Event&)>;
 
-		virtual unsigned int GetWidth() const = 0;
-		virtual unsigned int GetHeight() const = 0;
+        virtual ~Window() = default;
 
-		virtual void SetEventCallBack(const EventCallBackFn& callback) = 0;
-		virtual void SetVSync(bool enabled) = 0;
-		virtual bool IsVSync() const = 0;
+        virtual void OnUpdate() = 0;
+        virtual uint32_t GetWidth() const = 0;
+        virtual uint32_t GetHeight() const = 0;
 
-		virtual void* GetNativeWindow() const = 0;
-	
-		static Window* Create(const WindowProps& props = WindowProps());
-	};
+        virtual void SetEventCallback(const EventCallbackFn& callback) = 0;
+        virtual void SetVSync(bool enabled) = 0;
+        virtual bool IsVSync() const = 0;
+
+        virtual void* GetNativeWindow() const = 0;
+
+        static Window* Create(const WindowProps& props = WindowProps());
+    };
+
 }
