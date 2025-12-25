@@ -58,11 +58,11 @@ namespace FallEngine {
         m_Size = 0;
     }
 
-    bool MappedFile::Open(const std::filesystem::path& path) {
+    bool MappedFile::Open(const std::string& path) {
         Close(); 
 
-        m_FileHandle = CreateFileW(
-            path.wstring().c_str(),
+        m_FileHandle = CreateFileA(
+            path.c_str(),
             GENERIC_READ,
             FILE_SHARE_READ,
             nullptr,

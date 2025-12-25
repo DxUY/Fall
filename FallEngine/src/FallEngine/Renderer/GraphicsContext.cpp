@@ -1,6 +1,5 @@
 #include "FallEnginePCH.h"
 #include "GraphicsContext.h"
-#include <thread>
 
 namespace FallEngine {
 	GraphicsContext::GraphicsContext(SDL_Window * windowHandle)
@@ -19,8 +18,8 @@ namespace FallEngine {
     {
         m_GPUDevice = SDL_CreateGPUDevice(
             SDL_GPU_SHADERFORMAT_SPIRV | SDL_GPU_SHADERFORMAT_DXIL | SDL_GPU_SHADERFORMAT_MSL,
-            true,
-            nullptr
+            false,
+            NULL
         );
 
         FALL_CORE_ASSERT(m_GPUDevice, "Failed to create GPU device");

@@ -4,7 +4,7 @@
 
 namespace FallEngine {
 
-	Buffer FileSystem::ReadFileBinary(const std::filesystem::path& filepath) {
+	Buffer FileSystem::ReadFileBinary(const std::string& filepath) {
 		std::ifstream stream(filepath, std::ios::binary | std::ios::ate);
 
 		if (!stream)
@@ -22,7 +22,7 @@ namespace FallEngine {
 		return buffer;
 	}
 
-	MappedFile FileSystem::MapFileBinary(const std::filesystem::path& filepath) {
+	MappedFile FileSystem::MapFileBinary(const std::string& filepath) {
 		MappedFile mapped;
 		mapped.Open(filepath);
 		return mapped;

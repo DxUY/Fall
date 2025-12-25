@@ -32,7 +32,7 @@ namespace FallEngine {
 		void Shutdown();
 
 		void PollEvents();
-		void ProcessEvent(const SDL_Event& event);   
+		void ProcessEvent(const SDL_Event& event);
 
 	private:
 		SDL_Window* m_Window;

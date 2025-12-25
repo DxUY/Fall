@@ -14,10 +14,11 @@ namespace FallEngine {
         void Init();
 
         SDL_GPUDevice* GetDevice() const { return m_GPUDevice; }
+		SDL_Window* GetWindowHandle() const { return m_WindowHandle; }
 
     private:
-        SDL_Window* m_WindowHandle;
-        SDL_GPUDevice* m_GPUDevice;
+        SDL_Window* m_WindowHandle = nullptr;
+        SDL_GPUDevice* m_GPUDevice = nullptr;
     };
 
 }

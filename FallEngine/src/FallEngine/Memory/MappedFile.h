@@ -1,7 +1,7 @@
 #pragma once
 
 #include "BufferView.h"
-#include <filesystem>
+#include <string>
 
 namespace FallEngine {
 
@@ -16,7 +16,7 @@ namespace FallEngine {
         MappedFile(MappedFile&& other) noexcept;
         MappedFile& operator=(MappedFile&& other) noexcept;
 
-        bool Open(const std::filesystem::path& path);
+        bool Open(const std::string& path);
         void Close();
 
         bool IsOpen() const { return m_Data != nullptr; }

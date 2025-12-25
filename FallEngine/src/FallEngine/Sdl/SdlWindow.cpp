@@ -39,9 +39,9 @@ namespace FallEngine {
 		}
 
 		{
-		#if defined(FALL_DEBUG)
-		
-		#endif
+#if defined(FALL_DEBUG)
+
+#endif
 			m_Window = SDL_CreateWindow(m_Data.Title.c_str(), m_Data.Width, m_Data.Height, SDL_WINDOW_RESIZABLE);
 			++s_SDLWindowCount;
 		}
@@ -148,7 +148,7 @@ namespace FallEngine {
 	}
 
 	void SdlWindow::SetVSync(bool enabled) {
-		
+
 	}
 
 }

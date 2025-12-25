@@ -15,10 +15,18 @@ set(FALLENGINE_SRC
  
     src/FallEngine/Renderer/GraphicsContext.cpp
     src/FallEngine/Renderer/Renderer.cpp
-    src/FallEngine/Renderer/ComputeShader.cpp
-    src/FallEngine/Renderer/GraphicsShader.cpp
     src/FallEngine/Renderer/RenderPass.cpp
     src/FallEngine/Renderer/Texture.cpp
+    
+    src/FallEngine/Renderer/Pipeline.cpp
+    
+    src/FallEngine/Renderer/Buffers/Buffer.cpp
+    src/FallEngine/Renderer/Buffers/FrameBuffer.cpp
+    src/FallEngine/Renderer/Buffers/UniformBuffer.cpp
+
+    src/FallEngine/Renderer/Shaders/ComputeShader.cpp
+    src/FallEngine/Renderer/Shaders/GraphicsShader.cpp
+    src/FallEngine/Renderer/Shaders/ShaderCompiler.cpp
     
     src/FallEngine/Sdl/SdlWindow.cpp
     src/FallEngine/Sdl/SdlInput.cpp

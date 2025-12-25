@@ -1,4 +1,5 @@
 #pragma once
+
 #include <SDL3/SDL_gpu.h>
 
 namespace FallEngine {
@@ -21,8 +22,9 @@ namespace FallEngine {
         static SDL_GPUCommandBuffer* GetCommandBuffer();
 
     private:
-        static SDL_GPUDevice* s_Device;
-        static SDL_GPUCommandBuffer* s_CommandBuffer;
+        static inline SDL_GPUDevice* s_Device = nullptr;
+        static inline SDL_GPUCommandBuffer* s_CommandBuffer = nullptr;
+        static inline SDL_Window* s_Window = nullptr;
     };
 
 }
