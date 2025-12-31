@@ -1,8 +1,6 @@
 #include "FallEnginePCH.h"
 #include "MappedFile.h"
 
-#include <filesystem>
-
 namespace FallEngine {
 
     MappedFile::~MappedFile() {
@@ -11,14 +9,16 @@ namespace FallEngine {
 
     MappedFile::MappedFile(MappedFile&& other) noexcept
         : m_Data(other.m_Data),
-        m_Size(other.m_Size),
-        m_FileHandle(other.m_FileHandle),
-        m_MappingHandle(other.m_MappingHandle)
+        m_Size(other.m_Size)
     {
+#if defined(FALL_PLATFORM_WINDOWS)
+        m_FileHandle = other.m_FileHandle;
+        m_MappingHandle = other.m_MappingHandle;
+        other.m_FileHandle = (void*)-1;
+        other.m_MappingHandle = nullptr;
+#endif
         other.m_Data = nullptr;
         other.m_Size = 0;
-        other.m_FileHandle = nullptr;
-        other.m_MappingHandle = nullptr;
     }
 
     MappedFile& MappedFile::operator=(MappedFile&& other) noexcept {
@@ -27,40 +27,42 @@ namespace FallEngine {
 
             m_Data = other.m_Data;
             m_Size = other.m_Size;
+#if defined(FALL_PLATFORM_WINDOWS)
             m_FileHandle = other.m_FileHandle;
             m_MappingHandle = other.m_MappingHandle;
-
+            other.m_FileHandle = (void*)-1;
+            other.m_MappingHandle = nullptr;
+#endif
             other.m_Data = nullptr;
             other.m_Size = 0;
-            other.m_FileHandle = nullptr;
-            other.m_MappingHandle = nullptr;
         }
         return *this;
     }
 
     void MappedFile::Close() {
-        if (!m_Data)
-            return;
-
-        UnmapViewOfFile(m_Data);
-        m_Data = nullptr;
+#if defined(FALL_PLATFORM_WINDOWS)
+        if (m_Data) {
+            UnmapViewOfFile(m_Data);
+            m_Data = nullptr;
+        }
 
         if (m_MappingHandle) {
             CloseHandle(m_MappingHandle);
             m_MappingHandle = nullptr;
         }
 
-        if (m_FileHandle) {
+        if (m_FileHandle != (void*)-1) {
             CloseHandle(m_FileHandle);
-            m_FileHandle = nullptr;
+            m_FileHandle = (void*)-1;
         }
-
+#endif
         m_Size = 0;
     }
 
     bool MappedFile::Open(const std::string& path) {
-        Close(); 
+        Close();
 
+#if defined(FALL_PLATFORM_WINDOWS)
         m_FileHandle = CreateFileA(
             path.c_str(),
             GENERIC_READ,
@@ -71,18 +73,19 @@ namespace FallEngine {
             nullptr
         );
 
-        if (m_FileHandle == INVALID_HANDLE_VALUE)
+        if (m_FileHandle == (void*)-1) {
             return false;
+        }
 
         LARGE_INTEGER size;
-        if (!GetFileSizeEx(m_FileHandle, &size)) {
+        if (!GetFileSizeEx(m_FileHandle, &size) || size.QuadPart == 0) {
             Close();
             return false;
         }
 
         m_Size = static_cast<size_t>(size.QuadPart);
 
-        m_MappingHandle = CreateFileMappingW(
+        m_MappingHandle = CreateFileMappingA(
             m_FileHandle,
             nullptr,
             PAGE_READONLY,
@@ -108,6 +111,9 @@ namespace FallEngine {
         }
 
         return true;
+#else
+        return false;
+#endif
     }
 
 }

@@ -1,10 +1,10 @@
 #include "SdlWindow.h"
 
-#include "Core/Input.h"
+#include "FallEngine/Core/Input.h"
 
-#include "Events/ApplicationEvent.h"
-#include "Events/KeyEvent.h"
-#include "Events/MouseEvent.h"
+#include "FallEngine/Events/ApplicationEvent.h"
+#include "FallEngine/Events/KeyEvent.h"
+#include "FallEngine/Events/MouseEvent.h"
 
 namespace FallEngine {
 

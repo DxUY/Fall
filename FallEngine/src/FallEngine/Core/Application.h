@@ -3,6 +3,9 @@
 #include "Base.h"
 #include "LayerStack.h"
 
+#include "Renderer/GPU/GPUContext.h"
+#include "Renderer/Core/Renderer.h"
+
 namespace FallEngine {
 
     class Window;
@@ -27,6 +30,10 @@ namespace FallEngine {
         bool OnWindowClose(WindowCloseEvent& e);
 
         Scope<Window> m_Window;
+
+        Scope<GPUContext> m_GPUContext;
+        Scope<Renderer>   m_Renderer;
+        
         bool m_Running = true;
         LayerStack m_layerStack;
 

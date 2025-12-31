@@ -29,10 +29,8 @@ namespace FallEngine {
         size_t m_Size = 0;
 
 #if defined(FALL_PLATFORM_WINDOWS)
-        void* m_FileHandle = nullptr;
+        void* m_FileHandle = (void*)-1; // INVALID_HANDLE_VALUE
         void* m_MappingHandle = nullptr;
-#else
-#error "MappedFile only supports Windows in current engine configuration."
 #endif
     };
 

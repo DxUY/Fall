@@ -1,31 +1,35 @@
+#include "FallEnginePCH.h"
 #include "FileSystem.h"
-
 #include <fstream>
 
 namespace FallEngine {
 
-	Buffer FileSystem::ReadFileBinary(const std::string& filepath) {
-		std::ifstream stream(filepath, std::ios::binary | std::ios::ate);
+    Buffer FileSystem::ReadFileBinary(const std::string& filepath) {
+        std::ifstream stream(filepath, std::ios::binary | std::ios::ate);
 
-		if (!stream)
-			return {};
+        if (!stream.is_open()) {
+            return {};
+        }
 
-		std::streampos end = stream.tellg();
-		stream.seekg(0, std::ios::beg);
+        const std::streamsize size = stream.tellg();
+        if (size <= 0) {
+            return {};
+        }
 
-		size_t size = static_cast<size_t>(end - stream.tellg());
-		if (size == 0)
-			return {};
+        stream.seekg(0, std::ios::beg);
 
-		Buffer buffer(size);
-		stream.read(reinterpret_cast<char*>(buffer.Data()), size);
-		return buffer;
-	}
+        Buffer buffer(static_cast<size_t>(size));
+        if (!stream.read(reinterpret_cast<char*>(buffer.Data()), size)) {
+            return {};
+        }
 
-	MappedFile FileSystem::MapFileBinary(const std::string& filepath) {
-		MappedFile mapped;
-		mapped.Open(filepath);
-		return mapped;
-	}
+        return buffer;
+    }
+
+    MappedFile FileSystem::MapFileBinary(const std::string& filepath) {
+        MappedFile mapped;
+        mapped.Open(filepath); 
+        return mapped;
+    }
 
 }

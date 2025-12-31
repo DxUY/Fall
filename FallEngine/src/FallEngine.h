@@ -2,7 +2,7 @@
 
 #include "FallEngine/Core/Application.h"
 #include "FallEngine/Core/Layer.h"
-#include "FallEngine/Core/Log.h"
+#include "FallEngine/DebugTools/Log.h"
 
 #include "FallEngine/Core/Input.h"
 #include "FallEngine/Events/KeyEvent.h"

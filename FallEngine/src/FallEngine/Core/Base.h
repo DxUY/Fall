@@ -1,8 +1,7 @@
 #pragma once
 
-#include "FallEngine/Core/PlatformDetection.h"
-
 #include <memory>
+#include <thread>
 
 #ifdef FALL_DEBUG
     #if defined(FALL_PLATFORM_WINDOWS)
@@ -21,6 +20,20 @@
 	#define FALL_GRAPHICS_DEBUG
 #endif
 
+#ifdef FALL_DEBUG
+	#define FALL_ASSERT_GPU_THREAD()                                     \
+			do {                                                             \
+				if (!::FallEngine::IsOnGPUThread()) {                        \
+					FALL_CORE_ERROR("GPU Thread Violation");                 \
+					FALL_CORE_ERROR("Expected GPU thread");                  \
+					FALL_DEBUGBREAK();                                       \
+				}                                                            \
+			} while (0)
+#else
+	#define FALL_ASSERT_GPU_THREAD()
+#endif
+
+
 #define FALL_EXPAND_MACRO(x) x
 #define FALL_STRINGIFY_MACRO(x) #x
 
@@ -35,6 +48,9 @@
     T& operator=(T&&) = delete;
 
 namespace FallEngine {
+
+	void SetGPUThreadID();
+	bool IsOnGPUThread();
 
 	template<typename T>
 	using Scope = std::unique_ptr<T>;
@@ -54,5 +70,5 @@ namespace FallEngine {
 
 }
 
-#include "FallEngine/Core/Log.h"
-#include "FallEngine/Core/Assert.h"
+#include "FallEngine/DebugTools/Log.h"
+#include "FallEngine/DebugTools/Assert.h"

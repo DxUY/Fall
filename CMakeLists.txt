@@ -17,6 +17,7 @@ endforeach()
 
 # --- 2. ADD SUBDIRECTORIES ---
 add_subdirectory(FallEngine)
+add_subdirectory(Editor)
 
 # --- 3. IDE POLISH ---
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Editor)
