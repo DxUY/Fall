@@ -19,7 +19,7 @@ namespace FallEngine {
 		unsigned int GetHeight() const override { return m_Data.Height; }
 
 		void SetEventCallback(const EventCallbackFn& callback) override { m_Data.EventCallBack = callback; }
-		void SetVSync(bool enabled) override;
+		void SetVSync(bool enabled) override { m_Data.VSync = enabled; }
 		bool IsVSync() const override { return m_Data.VSync; }
 
 		inline virtual void* GetNativeWindow() const override { return m_Window; }

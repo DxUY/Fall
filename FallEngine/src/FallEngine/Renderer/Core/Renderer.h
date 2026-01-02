@@ -1,6 +1,7 @@
 #pragma once
 
 #include "FallEngine/Core/Base.h"
+#include "FrameContext.h"
 
 namespace FallEngine {
 
@@ -9,7 +10,7 @@ namespace FallEngine {
 
 	class Renderer {
 	public:
-		explicit Renderer(GPUContext& gpu);
+		Renderer(GPUContext& gpu);
 		~Renderer();
 
 		FALL_NON_COPYABLE(Renderer);
@@ -20,6 +21,9 @@ namespace FallEngine {
 	private:
 		GPUContext& m_GPU;
 		GPUCommand* m_Command = nullptr;
+
+		FrameContext m_Frame;
+		uint64_t m_FrameIndex = 0;
 	};
 
 }

@@ -4,6 +4,8 @@
 #include "Renderer/GPU/GPUContext.h"
 #include "Renderer/GPU/GPUCommand.h"
 
+#include "Renderer/Pass/ClearPass.h"
+
 namespace FallEngine {
 
 	Renderer::Renderer(GPUContext& gpu)
@@ -21,15 +23,16 @@ namespace FallEngine {
 	{
 		FALL_ASSERT_GPU_THREAD();
 
+		m_Frame.Reset(++m_FrameIndex);
 		m_Command->Begin();
 
-		// Backbuffer acquisition will be added here later
+		ClearPass clear(m_GPU);
+		clear.Execute(*m_Command);
 	}
 
 	void Renderer::EndFrame()
 	{
 		FALL_ASSERT_GPU_THREAD();
-
 		m_Command->End();
 	}
 

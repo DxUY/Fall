@@ -147,8 +147,4 @@ namespace FallEngine {
 		PollEvents();
 	}
 
-	void SdlWindow::SetVSync(bool enabled) {
-
-	}
-
 }

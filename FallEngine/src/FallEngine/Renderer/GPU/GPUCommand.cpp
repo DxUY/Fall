@@ -6,52 +6,47 @@
 
 namespace FallEngine {
 
-	struct GPUCommand::Impl
-	{
-		SDL_GPUCommandBuffer* CommandBuffer = nullptr;
+	struct GPUCommand::Impl {
+		SDL_GPUCommandBuffer* Cmd = nullptr;
 		bool Recording = false;
 	};
 
 	GPUCommand::GPUCommand(GPUContext& gpu)
-		: m_GPU(gpu), m_Impl(new Impl())
-	{
-	}
+		: m_Impl(new Impl()), m_GPU(gpu) {}
 
-	GPUCommand::~GPUCommand()
-	{
+	GPUCommand::~GPUCommand() {
 #ifdef FALL_DEBUG
 		FALL_CORE_ASSERT(
 			!m_Impl->Recording,
-			"GPUCommandContext destroyed while recording"
+			"GPUCommand destroyed while recording"
 		);
 #endif
 		delete m_Impl;
 	}
 
-	void GPUCommand::Begin()
-	{
+	void GPUCommand::Begin() {
 		FALL_ASSERT_GPU_THREAD();
-		FALL_CORE_ASSERT(!m_Impl->Recording, "Command buffer already recording");
+		FALL_CORE_ASSERT(!m_Impl->Recording, "Command already recording");
 
-		m_Impl->CommandBuffer = SDL_AcquireGPUCommandBuffer(m_GPU.GetDevice());
-		FALL_CORE_ASSERT(m_Impl->CommandBuffer, "Failed to acquire command buffer");
-
+		m_Impl->Cmd = m_GPU.AcquireCommandBuffer();
 		m_Impl->Recording = true;
 	}
 
-	void GPUCommand::End()
-	{
+	void GPUCommand::End() {
 		FALL_ASSERT_GPU_THREAD();
 		FALL_CORE_ASSERT(m_Impl->Recording, "End called without Begin");
 
-		SDL_SubmitGPUCommandBuffer(m_Impl->CommandBuffer);
-		m_Impl->CommandBuffer = nullptr;
+		m_GPU.SubmitCommandBuffer(m_Impl->Cmd);
+		m_Impl->Cmd = nullptr;
 		m_Impl->Recording = false;
 	}
 
-	bool GPUCommand::IsRecording() const
-	{
+	bool GPUCommand::IsRecording() const {
 		return m_Impl->Recording;
+	}
+
+	SDL_GPUCommandBuffer* GPUCommand::GetNativeCommandBuffer() const { 
+		return m_Impl->Cmd; 
 	}
 
 }

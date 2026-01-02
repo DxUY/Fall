@@ -2,6 +2,8 @@
 
 #include "FallEngine/Core/Base.h"
 
+struct SDL_GPUCommandBuffer;
+
 namespace FallEngine {
 
 	class GPUContext;
@@ -13,15 +15,22 @@ namespace FallEngine {
 
 		FALL_NON_COPYABLE(GPUCommand);
 
-		void Begin();   // Acquire command buffer
-		void End();     // Submit command buffer
+		void Begin();
+		void End();
 
 		bool IsRecording() const;
 
 	private:
-		GPUContext& m_GPU;
+		SDL_GPUCommandBuffer* GetNativeCommandBuffer() const;
+	
+	private:
+		friend class GPURenderPass;
+		friend class GPURenderTarget;
+
 		struct Impl;
-		Impl* m_Impl;   // PIMPL hides SDL types completely
+		Impl* m_Impl;
+
+		GPUContext& m_GPU;
 	};
 
 }

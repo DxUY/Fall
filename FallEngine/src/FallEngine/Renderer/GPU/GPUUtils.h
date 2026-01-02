@@ -1,29 +1,23 @@
 #pragma once
 
-namespace FallEngine::GPUUtils {
+namespace FallEngine {
 
-	// Push a GPU debug label onto the current command buffer
-	void PushDebugLabel(const char* name);
+	class GPUCommand;
 
-	// Pop the most recent GPU debug label
-	void PopDebugLabel();
+	namespace GPUUtils {
 
-	// RAII helper for GPU debug scopes
-	class DebugLabelScope {
-	public:
-		explicit DebugLabelScope(const char* name)
-		{
-#ifdef FALL_GRAPHICS_DEBUG
-			PushDebugLabel(name);
-#endif
-		}
+		void PushDebugLabel(GPUCommand& cmd, const char* name);
+		void PopDebugLabel(GPUCommand& cmd);
 
-		~DebugLabelScope()
-		{
-#ifdef FALL_GRAPHICS_DEBUG
-			PopDebugLabel();
-#endif
-		}
-	};
+		class DebugLabelScope {
+		public:
+			DebugLabelScope(GPUCommand& cmd, const char* name);
+			~DebugLabelScope();
+
+		private:
+			GPUCommand& m_Command;
+		};
+
+	}
 
 }

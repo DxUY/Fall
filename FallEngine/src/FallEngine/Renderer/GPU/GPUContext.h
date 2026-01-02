@@ -16,8 +16,11 @@ namespace FallEngine {
 
 		FALL_NON_COPYABLE(GPUContext);
 
-		bool Initialize(SDL_Window* window);
+		bool Initialize(void* window);
 		void Shutdown();
+
+		SDL_GPUCommandBuffer* AcquireCommandBuffer();
+		void SubmitCommandBuffer(SDL_GPUCommandBuffer* cmd);
 
 		bool AcquireBackbuffer(
 			SDL_GPUCommandBuffer* commandBuffer,
@@ -27,12 +30,6 @@ namespace FallEngine {
 		);
 
 		SDL_GPUTextureFormat GetBackbufferFormat() const { return m_BackbufferFormat; }
-
-	private:
-		SDL_GPUDevice* GetDevice() const { return m_Device; }
-
-	private:
-		friend class GPUCommand; // GPU-only access
 
 	private:
 		SDL_Window* m_Window = nullptr;

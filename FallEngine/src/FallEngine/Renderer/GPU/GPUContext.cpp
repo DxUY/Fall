@@ -15,7 +15,7 @@ namespace FallEngine {
 #endif
 	}
 
-	bool GPUContext::Initialize(SDL_Window* window)
+	bool GPUContext::Initialize(void* window)
 	{
 		SetGPUThreadID();
 		FALL_ASSERT_GPU_THREAD();
@@ -23,7 +23,7 @@ namespace FallEngine {
 		FALL_CORE_ASSERT(!m_Device, "GPUContext already initialized");
 		FALL_CORE_ASSERT(window, "GPUContext::Initialize called with null window");
 
-		m_Window = window;
+		m_Window = static_cast<SDL_Window*>(window);
 
 		m_Device = SDL_CreateGPUDevice(
 			SDL_GPU_SHADERFORMAT_SPIRV |
@@ -35,25 +35,27 @@ namespace FallEngine {
 
 		if (!m_Device)
 		{
-			FALL_CORE_ERROR("Failed to create SDL GPU device: {}", SDL_GetError());
+			FALL_CORE_ERROR("Failed to create GPU device: {}", SDL_GetError());
 			m_Window = nullptr;
 			return false;
 		}
 
-		FALL_CORE_INFO("GPU device created successfully");
-
-		if (!SDL_ClaimWindowForGPUDevice(m_Device, m_Window)) {
+		if (!SDL_ClaimWindowForGPUDevice(m_Device, m_Window))
+		{
 			FALL_CORE_ERROR("Failed to claim window for GPU device: {}", SDL_GetError());
+			SDL_DestroyGPUDevice(m_Device);
+			m_Device = nullptr;
+			m_Window = nullptr;
 			return false;
 		}
 
 		m_BackbufferFormat = SDL_GetGPUSwapchainTextureFormat(m_Device, m_Window);
-
 		FALL_CORE_ASSERT(
 			m_BackbufferFormat != SDL_GPU_TEXTUREFORMAT_INVALID,
-			"Invalid swapchain backbuffer format"
+			"Invalid backbuffer format"
 		);
 
+		FALL_CORE_INFO("GPUContext initialized");
 		return true;
 	}
 
@@ -73,16 +75,31 @@ namespace FallEngine {
 		m_BackbufferFormat = SDL_GPU_TEXTUREFORMAT_INVALID;
 	}
 
+	SDL_GPUCommandBuffer* GPUContext::AcquireCommandBuffer()
+	{
+		FALL_ASSERT_GPU_THREAD();
+		FALL_CORE_ASSERT(m_Device, "AcquireCommandBuffer called without device");
+
+		SDL_GPUCommandBuffer* cmd = SDL_AcquireGPUCommandBuffer(m_Device);
+		FALL_CORE_ASSERT(cmd, "Failed to acquire GPU command buffer");
+		return cmd;
+	}
+
+	void GPUContext::SubmitCommandBuffer(SDL_GPUCommandBuffer* cmd)
+	{
+		FALL_ASSERT_GPU_THREAD();
+		FALL_CORE_ASSERT(cmd, "SubmitCommandBuffer called with null buffer");
+
+		SDL_SubmitGPUCommandBuffer(cmd);
+	}
+
 	bool GPUContext::AcquireBackbuffer(
 		SDL_GPUCommandBuffer* commandBuffer,
 		SDL_GPUTexture** outTexture,
 		uint32_t* outWidth,
-		uint32_t* outHeight) {
+		uint32_t* outHeight)
+	{
 		FALL_ASSERT_GPU_THREAD();
-
-		FALL_CORE_ASSERT(m_Device, "AcquireBackbuffer called with no GPU device");
-		FALL_CORE_ASSERT(commandBuffer, "AcquireBackbuffer requires a command buffer");
-		FALL_CORE_ASSERT(outTexture, "AcquireBackbuffer requires outTexture");
 
 		return SDL_WaitAndAcquireGPUSwapchainTexture(
 			commandBuffer,

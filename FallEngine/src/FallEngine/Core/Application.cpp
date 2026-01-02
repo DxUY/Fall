@@ -50,10 +50,9 @@ namespace FallEngine {
         return true;
     }
 
-    void Application::Run()
-    {
-        while (m_Running)
-        {
+    void Application::Run() {
+        while (m_Running) {
+
             // --- Update layers ---
             for (Layer* layer : m_layerStack)
                 layer->OnUpdate();

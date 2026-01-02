@@ -2,11 +2,9 @@
 
 #include "Layers/EditorLayer.h"
 
-class Editor : public FallEngine::Application
-{
+class Editor : public FallEngine::Application {
 public:
-	Editor() 
-	{
+	Editor() {
 
 	}
 
