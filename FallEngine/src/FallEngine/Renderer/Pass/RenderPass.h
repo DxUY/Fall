@@ -1,14 +1,18 @@
 #pragma once
-#include "Renderer/Target/RenderTarget.h"
 
 namespace FallEngine {
 
 	class GPUCommand;
+	class FrameContext;
 
 	class RenderPass {
 	public:
 		virtual ~RenderPass() = default;
-		virtual void Execute(GPUCommand& cmd) = 0;
+
+		virtual void Execute(
+			GPUCommand& cmd,
+			const FrameContext& frame
+		) = 0;
 	};
 
 }

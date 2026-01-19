@@ -8,6 +8,8 @@ struct SDL_Window;
 
 namespace FallEngine {
 
+	class GPUContext;
+
 	class SdlWindow : public Window {
 	public:
 		SdlWindow(const WindowProps& props);
@@ -27,6 +29,8 @@ namespace FallEngine {
 		std::pair<float, float> GetMousePos() const;
 		std::pair<float, float> GetMouseDelta() const;
 
+		GPUContext& GetGPUContext() { return *m_GPUContext; }
+
 	private:
 		void Init(const WindowProps& props);
 		void Shutdown();
@@ -36,6 +40,7 @@ namespace FallEngine {
 
 	private:
 		SDL_Window* m_Window;
+		Scope<GPUContext> m_GPUContext;
 
 		struct WindowData {
 			std::string Title;

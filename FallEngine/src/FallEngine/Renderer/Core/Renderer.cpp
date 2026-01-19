@@ -4,36 +4,38 @@
 #include "Renderer/GPU/GPUContext.h"
 #include "Renderer/GPU/GPUCommand.h"
 
-#include "Renderer/Pass/ClearPass.h"
+#include "Renderer/Pass/RenderPass.h"
 
 namespace FallEngine {
 
-	Renderer::Renderer(GPUContext& gpu)
-		: m_GPU(gpu)
-	{
-		m_Command = new GPUCommand(m_GPU);
-	}
+    Renderer::Renderer(GPUContext& gpu) : m_GPU(gpu) {
+		m_Command = CreateScope<GPUCommand>(m_GPU);
+    }
 
-	Renderer::~Renderer()
-	{
-		delete m_Command;
-	}
+    Renderer::~Renderer() {}
 
-	void Renderer::BeginFrame()
-	{
-		FALL_ASSERT_GPU_THREAD();
+    void Renderer::BeginFrame() {
+        FALL_ASSERT_GPU_THREAD();
+        m_Frame.Reset(++m_FrameIndex);
+        m_Command->Begin();
 
-		m_Frame.Reset(++m_FrameIndex);
-		m_Command->Begin();
+        BackbufferView bb = m_GPU.AcquireBackbuffer(m_Command->GetNative());
 
-		ClearPass clear(m_GPU);
-		clear.Execute(*m_Command);
-	}
+        m_Frame.SetBackbuffer(bb);
+        m_Frame.SetCommand(m_Command.get());
+    }
 
-	void Renderer::EndFrame()
-	{
-		FALL_ASSERT_GPU_THREAD();
-		m_Command->End();
-	}
+    void Renderer::EndFrame() {
+        FALL_ASSERT_GPU_THREAD();
+        ExecuteFrame(m_Frame);
+        m_Command->End();
+    }
+
+    void Renderer::ExecuteFrame(FrameContext& frame) {
+        GPUCommand& cmd = frame.GetCommand();
+        for (RenderPass* pass : frame.GetPasses()) {
+            pass->Execute(cmd, frame);
+        }
+    }
 
 }

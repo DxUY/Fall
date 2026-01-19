@@ -11,8 +11,18 @@ namespace FallEngine {
             return {};
         }
 
-        const std::streamsize size = stream.tellg();
+        std::streampos pos = stream.tellg();
+        if (pos == std::streampos(-1)) {
+            return {};
+        }
+
+        const std::streamoff size = static_cast<std::streamoff>(pos);
         if (size <= 0) {
+            return {};
+        }
+
+        if (static_cast<unsigned long long>(size) > static_cast<unsigned long long>(std::numeric_limits<size_t>::max())) {
+            FALL_CORE_ERROR("File too large to read into memory: {0}", filepath);
             return {};
         }
 

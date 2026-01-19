@@ -15,12 +15,17 @@ namespace FallEngine {
 
 		FALL_NON_COPYABLE(Renderer);
 
+		FrameContext& GetFrame() { return m_Frame; }
+
 		void BeginFrame();
 		void EndFrame();
 
 	private:
+		void ExecuteFrame(FrameContext& frame);
+
+	private:
 		GPUContext& m_GPU;
-		GPUCommand* m_Command = nullptr;
+		Scope<GPUCommand> m_Command;
 
 		FrameContext m_Frame;
 		uint64_t m_FrameIndex = 0;

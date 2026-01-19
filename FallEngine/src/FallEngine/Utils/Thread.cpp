@@ -6,9 +6,9 @@ namespace FallEngine
     static std::thread::id s_GPUThreadID;
     static bool s_GPUThreadIDInitialized = false;
 
-    void SetGPUThreadID()
+    void SetGPUThreadID(bool force)
     {
-        if (!s_GPUThreadIDInitialized)
+        if (!s_GPUThreadIDInitialized || force)
         {
             s_GPUThreadID = std::this_thread::get_id();
             s_GPUThreadIDInitialized = true;

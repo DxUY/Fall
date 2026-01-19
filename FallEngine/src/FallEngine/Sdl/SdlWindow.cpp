@@ -6,6 +6,8 @@
 #include "FallEngine/Events/KeyEvent.h"
 #include "FallEngine/Events/MouseEvent.h"
 
+#include "FallEngine/Renderer/GPU/GPUContext.h"
+
 namespace FallEngine {
 
 	static uint8_t s_SDLWindowCount = 0;
@@ -20,6 +22,7 @@ namespace FallEngine {
 
 	SdlWindow::~SdlWindow() {
 		Shutdown();
+		m_GPUContext->Shutdown();
 	}
 
 	void SdlWindow::Init(const WindowProps& props) {
@@ -45,6 +48,9 @@ namespace FallEngine {
 			m_Window = SDL_CreateWindow(m_Data.Title.c_str(), m_Data.Width, m_Data.Height, SDL_WINDOW_RESIZABLE);
 			++s_SDLWindowCount;
 		}
+
+		m_GPUContext = CreateScope<GPUContext>();
+		m_GPUContext->Initialize(m_Window);
 
 		SetVSync(true);
 	}

@@ -29,8 +29,9 @@ namespace FallEngine {
         size_t m_Size = 0;
 
 #if defined(FALL_PLATFORM_WINDOWS)
-        void* m_FileHandle = (void*)-1; // INVALID_HANDLE_VALUE
-        void* m_MappingHandle = nullptr;
+    #include <Windows.h>
+        HANDLE m_FileHandle = INVALID_HANDLE_VALUE;
+        HANDLE m_MappingHandle = nullptr;
 #endif
     };
 

@@ -24,22 +24,28 @@ namespace FallEngine {
         return *m_Window;
     }
 
-    void Application::PushLayer(Layer* layer) {
-        m_layerStack.PushLayer(layer);
-        layer->OnAttach();
+    void Application::PushLayer(Scope<Layer> layer) {
+        Layer* raw = layer.get();
+        m_layerStack.PushLayer(std::move(layer));
+        raw->OnAttach();
     }
 
-    void Application::PushOverlay(Layer* overlay) {
-        m_layerStack.PushOverlay(overlay);
-        overlay->OnAttach();
+    void Application::PushOverlay(Scope<Layer> overlay) {
+        Layer* raw = overlay.get();
+        m_layerStack.PushOverlay(std::move(overlay));
+        raw->OnAttach();
     }
 
     void Application::OnEvent(Event& e) {
         EventDispatcher dispatcher(e);
         dispatcher.Dispatch<WindowCloseEvent>(FALL_BIND_EVENT_FN(OnWindowClose));
 
-        for (auto it = m_layerStack.end(); it != m_layerStack.begin();) {
-            (*--it)->OnEvent(e);
+        auto& layers = m_layerStack;
+        std::vector<Layer*> rawPtrs;
+        for (auto it = m_layerStack.begin(); it != m_layerStack.end(); ++it) rawPtrs.push_back(*it);
+
+        for (auto it = rawPtrs.rbegin(); it != rawPtrs.rend(); ++it) {
+            (*it)->OnEvent(e);
             if (e.IsHandled())
                 break;
         }
@@ -53,9 +59,8 @@ namespace FallEngine {
     void Application::Run() {
         while (m_Running) {
 
-            // --- Update layers ---
-            for (Layer* layer : m_layerStack)
-                layer->OnUpdate();
+            for (auto it = m_layerStack.begin(); it != m_layerStack.end(); ++it)
+                (*it)->OnUpdate();
 
             m_Window->OnUpdate();
         }

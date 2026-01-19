@@ -17,8 +17,8 @@ namespace FallEngine {
         void Run();
         void OnEvent(Event& e);
 
-        void PushLayer(Layer* layer);
-        void PushOverlay(Layer* overlay);
+        void PushLayer(Scope<Layer> layer);
+        void PushOverlay(Scope<Layer> overlay);
 
         static Application& Get() { return *s_Instance; }
         Window& GetWindow();

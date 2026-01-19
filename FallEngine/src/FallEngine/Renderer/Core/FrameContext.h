@@ -1,42 +1,43 @@
 #pragma once
 
+#include "FallEngine/Core/Base.h"
+#include "Renderer/GPU/GPUContext.h" 
+
 #include <cstdint>
 #include <vector>
 
-struct SDL_GPUTexture;
-
 namespace FallEngine {
 
-	class GPUCommand;
+    class GPUCommand;
+    class RenderPass;
 
-	class FrameContext {
-	public:
-		FrameContext() = default;
+    class FrameContext {
+    public:
+        FrameContext() = default;
+        ~FrameContext() = default;
 
-		void Reset(uint64_t newFrameIndex);
+        FALL_NON_COPYABLE(FrameContext)
 
-		uint64_t GetFrameIndex() const { return m_FrameIndex; }
-		GPUCommand* GetCommand() const { return m_Command; }
+        void Reset(uint64_t newFrameIndex);
 
-		SDL_GPUTexture* GetBackbuffer() const { return m_Backbuffer; }
-		uint32_t GetWidth() const { return m_Width; }
-		uint32_t GetHeight() const { return m_Height; }
+        uint64_t GetFrameIndex() const { return m_FrameIndex; }
 
-	private:
-		friend class Renderer;
+        GPUCommand& GetCommand() const;
+        const BackbufferView& GetBackbuffer() const;
 
-		void SetCommand(GPUCommand* command) { m_Command = command; }
-		void SetBackbuffer(SDL_GPUTexture* tex, uint32_t w, uint32_t h);
+        void AddPass(RenderPass* pass);
+        const std::vector<RenderPass*>& GetPasses() const;
 
-	private:
-		uint64_t m_FrameIndex = 0;
-		GPUCommand* m_Command = nullptr;
+    private:
+        friend class Renderer;
 
-		SDL_GPUTexture* m_Backbuffer = nullptr;
-		uint32_t m_Width = 0;
-		uint32_t m_Height = 0;
+        void SetCommand(GPUCommand* command);
+        void SetBackbuffer(const BackbufferView& view);
 
-		std::vector<void*> m_TransientResources;
-	};
-
+    private:
+        uint64_t m_FrameIndex = 0;
+        GPUCommand* m_Command = nullptr;
+        BackbufferView m_Backbuffer;
+        std::vector<RenderPass*> m_Passes;
+    };
 }

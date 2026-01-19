@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Log.h"
+#include "FallEngine/Core/Base.h"
 
 #include <algorithm>
 #include <chrono>
@@ -15,8 +16,7 @@ namespace FallEngine {
 
 	using FloatingPointMicroseconds = std::chrono::duration<double, std::micro>;
 
-	struct ProfileResult
-	{
+	struct ProfileResult {
 		std::string Name;
 
 		FloatingPointMicroseconds Start;
@@ -24,22 +24,18 @@ namespace FallEngine {
 		std::thread::id ThreadID;
 	};
 
-	struct InstrumentationSession
-	{
+	struct InstrumentationSession {
 		std::string Name;
 	};
 
-	class Instrumentor
-	{
+	class Instrumentor {
 	public:
-		Instrumentor(const Instrumentor&) = delete;
-		Instrumentor(Instrumentor&&) = delete;
+		FALL_NON_COPYABLE(Instrumentor)
 
-		void BeginSession(const std::string& name, const std::string& filepath = "results.json")
-		{
+		void BeginSession(const std::string& name, const std::string& filepath = "results.json") {
 			std::lock_guard lock(m_Mutex);
-			if (m_CurrentSession)
-			{
+			if (m_CurrentSession) {
+				
 				// If there is already a current session, then close it before beginning new one.
 				// Subsequent profiling output meant for the original session will end up in the
 				// newly opened session instead.  That's better than having badly formatted
@@ -52,112 +48,140 @@ namespace FallEngine {
 			}
 			m_OutputStream.open(filepath);
 
-			if (m_OutputStream.is_open())
-			{
-				m_CurrentSession = new InstrumentationSession({ name });
+			if (m_OutputStream.is_open()) {
+				m_CurrentSession = std::make_unique<InstrumentationSession>(InstrumentationSession{ name });
 				WriteHeader();
-			}
-			else
-			{
-				if (Log::GetCoreLogger()) // Edge case: BeginSession() might be before Log::Init()
-				{
+			} else {
+				if (Log::GetCoreLogger()) { // Edge case: BeginSession() might be before Log::Init()
 					FALL_CORE_ERROR("Instrumentor could not open results file '{0}'.", filepath);
 				}
 			}
 		}
 
-		void EndSession()
-		{
+		void EndSession() {
 			std::lock_guard lock(m_Mutex);
 			InternalEndSession();
 		}
 
-		void WriteProfile(const ProfileResult& result)
-		{
-			std::stringstream json;
+		void WriteProfile(const ProfileResult& result) {
+			const std::string escapedName = EscapeJsonString(result.Name);
 
-			json << std::setprecision(3) << std::fixed;
-			json << ",{";
-			json << "\"cat\":\"function\",";
-			json << "\"dur\":" << (result.ElapsedTime.count()) << ',';
-			json << "\"name\":\"" << result.Name << "\",";
-			json << "\"ph\":\"X\",";
-			json << "\"pid\":0,";
-			json << "\"tid\":" << result.ThreadID << ",";
-			json << "\"ts\":" << result.Start.count();
-			json << "}";
-
-			std::lock_guard lock(m_Mutex);
-			if (m_CurrentSession)
+			uint64_t tid;
 			{
-				m_OutputStream << json.str();
+				std::lock_guard<std::mutex> lock(m_Mutex);
+
+				auto it = m_ThreadIdMap.find(result.ThreadID);
+				if (it == m_ThreadIdMap.end()) {
+					tid = m_NextThreadId++;
+					m_ThreadIdMap.emplace(result.ThreadID, tid);
+				}
+				else {
+					tid = it->second;
+				}
+
+				if (!m_CurrentSession)
+					return;
+
+				if (!m_FirstEvent)
+					m_OutputStream << ",";
+				else
+					m_FirstEvent = false;
+
+				m_OutputStream << "{";
+				m_OutputStream << "\"cat\":\"function\",";
+				m_OutputStream << "\"dur\":" << (result.ElapsedTime.count()) << ",";
+				m_OutputStream << "\"name\":\"" << escapedName << "\",";
+				m_OutputStream << "\"ph\":\"X\",";
+				m_OutputStream << "\"pid\":0,";
+				m_OutputStream << "\"tid\":" << tid << ",";
+				m_OutputStream << "\"ts\":" << result.Start.count();
+				m_OutputStream << "}";
 				m_OutputStream.flush();
 			}
 		}
 
-		static Instrumentor& Get()
-		{
+		static Instrumentor& Get() {
 			static Instrumentor instance;
 			return instance;
 		}
 	private:
 		Instrumentor()
-			: m_CurrentSession(nullptr)
-		{
-		}
+			: m_CurrentSession(nullptr), m_NextThreadId(1), m_FirstEvent(true) {}
 
-		~Instrumentor()
-		{
+		~Instrumentor() {
 			EndSession();
 		}
 
-		void WriteHeader()
-		{
-			m_OutputStream << "{\"otherData\": {},\"traceEvents\":[{}";
+		void WriteHeader() {
+			m_OutputStream << "{\"otherData\": {},\"traceEvents\":[";
 			m_OutputStream.flush();
 		}
 
-		void WriteFooter()
-		{
+		void WriteFooter() {
 			m_OutputStream << "]}";
 			m_OutputStream.flush();
 		}
 
+		static std::string EscapeJsonString(const std::string& s) {
+			std::string out;
+			out.reserve(s.size());
+			for (unsigned char uc : s) {
+				char c = static_cast<char>(uc);
+				switch (c) {
+				case '\\': out += "\\\\"; break;
+				case '"':  out += "\\\""; break;
+				case '\b': out += "\\b"; break;
+				case '\f': out += "\\f"; break;
+				case '\n': out += "\\n"; break;
+				case '\r': out += "\\r"; break;
+				case '\t': out += "\\t"; break;
+				default:
+					if (uc < 0x20) {
+						char buf[7];
+						std::snprintf(buf, sizeof(buf), "\\u%04x", uc);
+						out += buf;
+					}
+					else {
+						out += c;
+					}
+				}
+			}
+			return out;
+		}
+
 		// Note: you must already own lock on m_Mutex before
 		// calling InternalEndSession()
-		void InternalEndSession()
-		{
-			if (m_CurrentSession)
-			{
+		void InternalEndSession() {
+			if (m_CurrentSession) {
 				WriteFooter();
 				m_OutputStream.close();
-				delete m_CurrentSession;
-				m_CurrentSession = nullptr;
+				m_CurrentSession.reset();
 			}
 		}
 	private:
 		std::mutex m_Mutex;
-		InstrumentationSession* m_CurrentSession;
+		std::unique_ptr<InstrumentationSession> m_CurrentSession;
 		std::ofstream m_OutputStream;
+
+		std::unordered_map<std::thread::id, uint64_t> m_ThreadIdMap;
+		uint64_t m_NextThreadId;
+		bool m_FirstEvent;
 	};
 
 	class InstrumentationTimer
 	{
 	public:
 		InstrumentationTimer(const char* name)
-			: m_Name(name), m_Stopped(false)
-		{
+			: m_Name(name), m_Stopped(false) {
 			m_StartTimepoint = std::chrono::steady_clock::now();
 		}
 
-		~InstrumentationTimer()
-		{
+		~InstrumentationTimer() {
 			if (!m_Stopped)
 				Stop();
 		}
 
-		void Stop()
-		{
+		void Stop() {
 			auto endTimepoint = std::chrono::steady_clock::now();
 			auto highResStart = FloatingPointMicroseconds{ m_StartTimepoint.time_since_epoch() };
 			auto elapsedTime = std::chrono::time_point_cast<std::chrono::microseconds>(endTimepoint).time_since_epoch() - std::chrono::time_point_cast<std::chrono::microseconds>(m_StartTimepoint).time_since_epoch();
@@ -175,28 +199,30 @@ namespace FallEngine {
 	namespace InstrumentorUtils {
 
 		template <size_t N>
-		struct ChangeResult
-		{
+		struct ChangeResult {
 			char Data[N];
 		};
 
 		template <size_t N, size_t K>
-		constexpr auto CleanupOutputString(const char(&expr)[N], const char(&remove)[K])
-		{
+		constexpr auto CleanupOutputString(const char(&expr)[N], const char(&remove)[K]) {
 			ChangeResult<N> result = {};
-
 			size_t srcIndex = 0;
 			size_t dstIndex = 0;
-			while (srcIndex < N)
+			while (srcIndex < N && dstIndex + 1 < N)
 			{
 				size_t matchIndex = 0;
 				while (matchIndex < K - 1 && srcIndex + matchIndex < N - 1 && expr[srcIndex + matchIndex] == remove[matchIndex])
 					matchIndex++;
 				if (matchIndex == K - 1)
 					srcIndex += matchIndex;
-				result.Data[dstIndex++] = expr[srcIndex] == '"' ? '\'' : expr[srcIndex];
+				char c = expr[srcIndex];
+				result.Data[dstIndex++] = (c == '"') ? '\'' : c;
 				srcIndex++;
 			}
+			if (dstIndex < N)
+				result.Data[dstIndex] = '\0';
+			else
+				result.Data[N - 1] = '\0';
 			return result;
 		}
 	}
@@ -222,16 +248,16 @@ namespace FallEngine {
 #elif defined(__cplusplus) && (__cplusplus >= 201103)
 #define F_FUNC_SIG __func__
 #else
-#define F_FUNC_SIG "HZ_FUNC_SIG unknown!"
+#define F_FUNC_SIG "F_FUNC_SIG unknown!"
 #endif
 
-#define F_PROFILE_BEGIN_SESSION(name, filepath) ::Hazel::Instrumentor::Get().BeginSession(name, filepath)
-#define F_PROFILE_END_SESSION() ::Hazel::Instrumentor::Get().EndSession()
-#define F_PROFILE_SCOPE_LINE2(name, line) constexpr auto fixedName##line = ::Hazel::InstrumentorUtils::CleanupOutputString(name, "__cdecl ");\
-											   ::Hazel::InstrumentationTimer timer##line(fixedName##line.Data)
-#define F_PROFILE_SCOPE_LINE(name, line) HZ_PROFILE_SCOPE_LINE2(name, line)
-#define F_PROFILE_SCOPE(name) HZ_PROFILE_SCOPE_LINE(name, __LINE__)
-#define F_PROFILE_FUNCTION() HZ_PROFILE_SCOPE(HZ_FUNC_SIG)
+#define F_PROFILE_BEGIN_SESSION(name, filepath) ::FallEngine::Instrumentor::Get().BeginSession(name, filepath)
+#define F_PROFILE_END_SESSION() ::FallEngine::Instrumentor::Get().EndSession()
+#define F_PROFILE_SCOPE_LINE2(name, line) constexpr auto fixedName##line = ::FallEngine::InstrumentorUtils::CleanupOutputString(name, "__cdecl ");\
+											   ::FallEngine::InstrumentationTimer timer##line(fixedName##line.Data)
+#define F_PROFILE_SCOPE_LINE(name, line) F_PROFILE_SCOPE_LINE2(name, line)
+#define F_PROFILE_SCOPE(name) F_PROFILE_SCOPE_LINE(name, __LINE__)
+#define F_PROFILE_FUNCTION() F_PROFILE_SCOPE(F_FUNC_SIG)
 #else
 #define F_PROFILE_BEGIN_SESSION(name, filepath)
 #define F_PROFILE_END_SESSION()

@@ -13,23 +13,19 @@ namespace FallEngine {
 		GPUCommand(GPUContext& gpu);
 		~GPUCommand();
 
-		FALL_NON_COPYABLE(GPUCommand);
+		FALL_NON_COPYABLE(GPUCommand)
 
 		void Begin();
 		void End();
 
 		bool IsRecording() const;
 
-	private:
-		SDL_GPUCommandBuffer* GetNativeCommandBuffer() const;
-	
-	private:
-		friend class GPURenderPass;
-		friend class GPURenderTarget;
+		SDL_GPUCommandBuffer* GetNative() const;
+		GPUContext& GetGPUContext() const { return m_GPU; }
 
+	private:
 		struct Impl;
-		Impl* m_Impl;
-
+		Scope<Impl> m_Impl;
 		GPUContext& m_GPU;
 	};
 

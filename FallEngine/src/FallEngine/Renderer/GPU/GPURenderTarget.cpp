@@ -1,41 +1,55 @@
 #include "FallEnginePCH.h"
-
 #include "GPURenderTarget.h"
+
+#include <SDL3/SDL_gpu.h>
+
 #include "GPUContext.h"
 #include "GPUCommand.h"
+#include "GPUTexture.h"
+
+#include "Renderer/Target/RenderTarget.h"
 
 namespace FallEngine {
 
 	GPURenderTarget::GPURenderTarget(
-		GPUContext& gpu,
 		GPUCommand& cmd,
-		const RenderTarget& desc
-	) {
-		SDL_GPUTexture* texture = nullptr;
-		uint32_t w = 0, h = 0;
+		const BackbufferView& backbuffer,
+		const RenderTarget& desc) : m_Storage{} {
+		FALL_ASSERT_GPU_THREAD();
+
+		auto* info = reinterpret_cast<SDL_GPUColorTargetInfo*>(m_Storage);
+		*info = {};
 
 		if (desc.IsBackbuffer()) {
-			gpu.AcquireBackbuffer(
-				cmd.GetNativeCommandBuffer(),
-				&texture,
-				&w,
-				&h
-			);
+			info->texture = static_cast<SDL_GPUTexture*>(backbuffer.opaque);
+			FALL_CORE_ASSERT(info->texture, "Attempting to use Backbuffer as target but it is null!");
+		}
+		else if (desc.HasTexture()) {
+			GPUTexture* tex = cmd.GetGPUContext().GetTextureRegistry().Resolve(desc.GetTexture());
+
+			FALL_CORE_ASSERT(tex, "Failed to resolve Texture handle in RenderTarget");
+			info->texture = tex->GetNative();
 		}
 
-		m_ColorInfo.texture = texture;
-		m_ColorInfo.load_op =
-			desc.GetLoadOp() == LoadOp::Clear
+		info->load_op = (desc.GetLoadOp() == LoadOp::Clear)
 			? SDL_GPU_LOADOP_CLEAR
 			: SDL_GPU_LOADOP_LOAD;
 
-		m_ColorInfo.store_op =
-			desc.GetStoreOp() == StoreOp::Store
+		info->store_op = (desc.GetStoreOp() == StoreOp::Store)
 			? SDL_GPU_STOREOP_STORE
 			: SDL_GPU_STOREOP_DONT_CARE;
 
-		auto& c = desc.GetClearColor();
-		m_ColorInfo.clear_color = { c.r, c.g, c.b, c.a };
+		const auto& c = desc.GetClearColor();
+		info->clear_color = { c.r, c.g, c.b, c.a };
+
+		info->mip_level = 0;
+		info->layer_or_depth_plane = 0;
+		info->cycle = false;
+	}
+
+	const void* GPURenderTarget::GetNativeInfo() const
+	{
+		return m_Storage;
 	}
 
 }

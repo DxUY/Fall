@@ -1,27 +1,30 @@
 #pragma once
 
-#include "Renderer/Target/RenderTarget.h"
-#include <SDL3/SDL_gpu.h>
+#include "FallEngine/Core/Base.h"
+#include <type_traits>
+#include <cstddef>
+#include <cstdint>
 
 namespace FallEngine {
 
-	class GPUContext;
 	class GPUCommand;
+	class RenderTarget;
+	struct BackbufferView;
 
 	class GPURenderTarget {
 	public:
 		GPURenderTarget(
-			GPUContext& gpu,
 			GPUCommand& cmd,
+			const BackbufferView& backbuffer, 
 			const RenderTarget& desc
 		);
 
-		const SDL_GPUColorTargetInfo& GetColorInfo() const {
-			return m_ColorInfo;
-		}
+		FALL_NON_COPYABLE(GPURenderTarget)
+
+		const void* GetNativeInfo() const;
 
 	private:
-		SDL_GPUColorTargetInfo m_ColorInfo{};
+		alignas(std::max_align_t) std::byte m_Storage[128];
 	};
 
 }

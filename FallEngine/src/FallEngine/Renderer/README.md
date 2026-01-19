@@ -189,18 +189,18 @@ Passes do not schedule other passes.
 Passes do not create GPU objects.
 Passes are executed explicitly by Renderer.
 
-*Manager Suffix (Ownership & Coordination)
+No Suffix (Ownership & Coordination)
 
-Managers own lifetime, caching, or coordination logic.
+Types own lifetime, caching, or coordination logic.
 
 Examples:
-PipelineManager
-ResourceManager
+Pipeline
+Resource
 
 Rules:
-Managers may launch async jobs.
-Managers must not submit GPU work directly.
-Managers must not block the renderer.
+Types may launch async jobs.
+Types must not submit GPU work directly.
+Types must not block the renderer.
 
 General Rules
 

@@ -10,11 +10,11 @@ namespace FallEngine::GPUUtils {
 	{
 #ifdef FALL_GRAPHICS_DEBUG
 		FALL_ASSERT_GPU_THREAD();
-		FALL_CORE_ASSERT(cmd.IsRecording(), "Debug label outside command recording");
-		FALL_CORE_ASSERT(name, "Debug label name null");
+		FALL_CORE_ASSERT(cmd.IsRecording(), "Debug label outside recording");
+		FALL_CORE_ASSERT(name, "Null debug label");
 
 		SDL_PushGPUCommandBufferDebugGroup(
-			cmd.GetNativeCommandBuffer(),
+			cmd.GetNative(),
 			name
 		);
 #else
@@ -26,10 +26,10 @@ namespace FallEngine::GPUUtils {
 	{
 #ifdef FALL_GRAPHICS_DEBUG
 		FALL_ASSERT_GPU_THREAD();
-		FALL_CORE_ASSERT(cmd.IsRecording(), "Debug pop outside command recording");
+		FALL_CORE_ASSERT(cmd.IsRecording(), "Debug pop outside recording");
 
 		SDL_PopGPUCommandBufferDebugGroup(
-			cmd.GetNativeCommandBuffer()
+			cmd.GetNative()
 		);
 #else
 		(void)cmd;
