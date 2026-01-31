@@ -6,6 +6,4 @@ namespace Fall {
 		: m_DebugName(name) {
 	}
 
-	Layer::~Layer() {}
-
 }

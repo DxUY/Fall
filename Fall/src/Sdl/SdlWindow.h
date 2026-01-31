@@ -21,7 +21,7 @@ namespace Fall {
 		unsigned int GetHeight() const override { return m_Data.Height; }
 
 		void SetEventCallback(const EventCallbackFn& callback) override { m_Data.EventCallBack = callback; }
-		void SetVSync(bool enabled) override { m_Data.VSync = enabled; }
+		void SetVSync(bool enabled) override;
 		bool IsVSync() const override { return m_Data.VSync; }
 
 		inline virtual void* GetNativeWindow() const override { return m_Window; }
@@ -29,7 +29,7 @@ namespace Fall {
 		std::pair<float, float> GetMousePos() const;
 		std::pair<float, float> GetMouseDelta() const;
 
-		GPUContext& GetGPUContext() { return *m_GPUContext; }
+		GPUContext& GetGPUContext() override { return *m_GPUContext; }
 
 	private:
 		void Init(const WindowProps& props);

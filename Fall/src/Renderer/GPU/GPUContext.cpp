@@ -41,6 +41,21 @@ namespace Fall {
         return {};
     }
 
+    void GPUContext::SetVSync(bool enabled) {
+        if (!m_Device || !m_Window) return;
+
+        SDL_GPUPresentMode mode = enabled
+            ? SDL_GPU_PRESENTMODE_VSYNC
+            : SDL_GPU_PRESENTMODE_IMMEDIATE;
+
+        SDL_SetGPUSwapchainParameters(
+            m_Device,
+            m_Window,
+            SDL_GPU_SWAPCHAINCOMPOSITION_SDR,
+            mode
+        );
+    }
+
     void GPUContext::Shutdown() {
         if (!m_Device)
             return;

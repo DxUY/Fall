@@ -23,7 +23,9 @@ namespace Fall {
         SDL_GPUCommandBuffer* AcquireCommandBuffer();
         void SubmitCommandBuffer(SDL_GPUCommandBuffer* cmd);
 
-        BackbufferView AcquireBackbuffer(SDL_GPUCommandBuffer* cmd);
+        BackbufferView AcquireBackbuffer(SDL_GPUCommandBuffer* cmd);\
+
+        void SetVSync(bool enabled);
 
         SDL_GPUDevice* GetDevice() const { return m_Device; }
 

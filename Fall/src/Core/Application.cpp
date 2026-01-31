@@ -1,10 +1,9 @@
 #include "FallPCH.h"
 #include "Application.h"
 
-#include "Window.h"
-#include "Events/Event.h"
-#include "Events/ApplicationEvent.h"
 #include "Layer.h"
+
+#include "Renderer/Core/Renderer.h"
 
 namespace Fall {
 
@@ -16,53 +15,48 @@ namespace Fall {
 
         m_Window = Scope<Window>(Window::Create());
         m_Window->SetEventCallback(FALL_BIND_EVENT_FN(OnEvent));
+
+        m_Renderer = CreateScope<Renderer>(m_Window->GetGPUContext());
     }
 
     Application::~Application() {}
 
-    Window& Application::GetWindow() {
-        return *m_Window;
+    void Application::PushLayer(Layer* layer) {
+        m_layerStack.PushLayer(layer);
+        layer->OnAttach();
     }
 
-    void Application::PushLayer(Scope<Layer> layer) {
-        Layer* raw = layer.get();
-        m_layerStack.PushLayer(std::move(layer));
-        raw->OnAttach();
-    }
-
-    void Application::PushOverlay(Scope<Layer> overlay) {
-        Layer* raw = overlay.get();
-        m_layerStack.PushOverlay(std::move(overlay));
-        raw->OnAttach();
+    void Application::PushOverlay(Layer* layer) {
+        m_layerStack.PushOverlay(layer);
+        layer->OnAttach();
     }
 
     void Application::OnEvent(Event& e) {
         EventDispatcher dispatcher(e);
-        dispatcher.Dispatch<WindowCloseEvent>(FALL_BIND_EVENT_FN(OnWindowClose));
+        dispatcher.Dispatch<WindowCloseEvent>(FALL_BIND_EVENT_FN(Application::OnWindowClose));
 
-        auto& layers = m_layerStack;
-        std::vector<Layer*> rawPtrs;
-        for (auto it = m_layerStack.begin(); it != m_layerStack.end(); ++it) rawPtrs.push_back(*it);
-
-        for (auto it = rawPtrs.rbegin(); it != rawPtrs.rend(); ++it) {
+        for (auto it = m_layerStack.rbegin(); it != m_layerStack.rend(); ++it) {
             (*it)->OnEvent(e);
             if (e.IsHandled())
                 break;
         }
     }
 
-    bool Application::OnWindowClose(WindowCloseEvent&) {
+    bool Application::OnWindowClose(WindowCloseEvent& e) {
         m_Running = false;
         return true;
     }
 
     void Application::Run() {
         while (m_Running) {
-
-            for (auto it = m_layerStack.begin(); it != m_layerStack.end(); ++it)
-                (*it)->OnUpdate();
-
             m_Window->OnUpdate();
+
+            m_Renderer->BeginFrame();
+            
+            for (Layer* layer : m_layerStack)
+                layer->OnUpdate();
+
+            m_Renderer->EndFrame();
         }
     }
 

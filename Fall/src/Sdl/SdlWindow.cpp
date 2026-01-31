@@ -149,4 +149,9 @@ namespace Fall {
 		PollEvents();
 	}
 
+	void SdlWindow::SetVSync(bool enabled) {
+		m_Data.VSync = enabled;
+		m_GPUContext->SetVSync(enabled);
+	}
+
 }

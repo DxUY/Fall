@@ -4,6 +4,8 @@
 
 namespace Fall {
 
+    class GPUContext;
+
     struct WindowProps {
         const char* Title = "Fall Engine";
         uint32_t Width = 1280;
@@ -23,6 +25,8 @@ namespace Fall {
         virtual void SetEventCallback(const EventCallbackFn& callback) = 0;
         virtual void SetVSync(bool enabled) = 0;
         virtual bool IsVSync() const = 0;
+
+        virtual GPUContext& GetGPUContext() = 0;
 
         virtual void* GetNativeWindow() const = 0;
 
