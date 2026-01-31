@@ -1,8 +1,10 @@
-#include <FallEngine.h>
+#include <Fall.h>
+#include "Core/EntryPoint.h"
 
 #include "Layers/EditorLayer.h"
 
-class Editor : public FallEngine::Application {
+
+class Editor : public Fall::Application {
 public:
 	Editor() {
 		
@@ -11,6 +13,6 @@ public:
 	~Editor() {}
 };
 
-FallEngine::Application* FallEngine::CreateApplication() {
+Fall::Application* Fall::CreateApplication() {
 	return new Editor();
 }
