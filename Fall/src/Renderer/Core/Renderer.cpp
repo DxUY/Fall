@@ -4,7 +4,7 @@
 #include "Renderer/GPU/GPUContext.h"
 #include "Renderer/GPU/GPUCommand.h"
 
-#include "Renderer/Pass/RenderPass.h"
+#include "Renderer/Pass/Pass.h"
 
 namespace Fall {
 
@@ -33,8 +33,10 @@ namespace Fall {
 
     void Renderer::ExecuteFrame(FrameContext& frame) {
         GPUCommand& cmd = frame.GetCommand();
-        for (RenderPass* pass : frame.GetPasses()) {
-            pass->Execute(cmd, frame);
+        for (const auto& pass : frame.GetPasses()) {
+            if (pass) {
+                pass->Execute(cmd, frame);
+            }
         }
     }
 

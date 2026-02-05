@@ -1,5 +1,4 @@
 #include "GPUContext.h"
-#include <SDL3/SDL_gpu.h>
 
 namespace Fall {
 
@@ -56,9 +55,13 @@ namespace Fall {
         );
     }
 
+    SDL_GPUTextureFormat GPUContext::GetSwapchainFormat() const {
+        if (!m_Device || !m_Window) return SDL_GPU_TEXTUREFORMAT_INVALID;
+        return SDL_GetGPUSwapchainTextureFormat(m_Device, m_Window);
+	}
+
     void GPUContext::Shutdown() {
-        if (!m_Device)
-            return;
+        if (!m_Device) return;
 
         SDL_WaitForGPUIdle(m_Device);
         SDL_ReleaseWindowFromGPUDevice(m_Device, m_Window);

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Renderer/Pass/RenderPass.h"
+#include "Renderer/Pass/Pass.h"
 #include "RenderItem.h"
 
 #include <vector>
@@ -9,7 +9,7 @@ namespace Fall {
 
     class PipelineManager; 
 
-    class ForwardRenderPass final : public RenderPass {
+    class ForwardRenderPass final : public Pass {
     public:
         ForwardRenderPass(PipelineManager& pipelineMgr);
 

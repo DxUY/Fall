@@ -33,6 +33,8 @@ namespace Fall {
         void Draw(uint32_t vertexCount, uint32_t instanceCount = 1, uint32_t firstVertex = 0, uint32_t firstInstance = 0);
         void DrawIndexed(uint32_t indexCount, uint32_t instanceCount = 1, uint32_t firstIndex = 0, uint32_t vertexOffset = 0, uint32_t firstInstance = 0);
 
+        SDL_GPURenderPass* GetNative() const { return m_Pass; }
+
     private:
         GPUCommand& m_Cmd;
         SDL_GPURenderPass* m_Pass = nullptr;

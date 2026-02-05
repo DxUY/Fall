@@ -18,9 +18,9 @@ endif()
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 add_subdirectory(Fall)
-add_subdirectory(Editor)
+add_subdirectory(Sandbox)
 
 set_property(
     DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    PROPERTY VS_STARTUP_PROJECT Editor
+    PROPERTY VS_STARTUP_PROJECT Sandbox
 )

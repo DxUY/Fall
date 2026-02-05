@@ -33,7 +33,7 @@ namespace Fall {
 		FALL_NON_COPYABLE(Instrumentor)
 
 		void BeginSession(const std::string& name, const std::string& filepath = "results.json") {
-			std::lock_guard lock(m_Mutex);
+			std::lock_guard<std::mutex> lock(m_Mutex);
 			if (m_CurrentSession) {
 				
 				// If there is already a current session, then close it before beginning new one.
@@ -59,7 +59,7 @@ namespace Fall {
 		}
 
 		void EndSession() {
-			std::lock_guard lock(m_Mutex);
+			std::lock_guard<std::mutex> lock(m_Mutex);
 			InternalEndSession();
 		}
 
@@ -230,34 +230,31 @@ namespace Fall {
 
 #define F_PROFILE 0
 #if F_PROFILE
-// Resolve which function signature macro will be used. Note that this only
-// is resolved when the (pre)compiler starts, so the syntax highlighting
-// could mark the wrong one in your editor!
-#if defined(__GNUC__) || (defined(__MWERKS__) && (__MWERKS__ >= 0x3000)) || (defined(__ICC) && (__ICC >= 600)) || defined(__ghs__)
-#define F_FUNC_SIG __PRETTY_FUNCTION__
-#elif defined(__DMC__) && (__DMC__ >= 0x810)
-#define F_FUNC_SIG __PRETTY_FUNCTION__
-#elif (defined(__FUNCSIG__) || (_MSC_VER))
-#define F_FUNC_SIG __FUNCSIG__
-#elif (defined(__INTEL_COMPILER) && (__INTEL_COMPILER >= 600)) || (defined(__IBMCPP__) && (__IBMCPP__ >= 500))
-#define F_FUNC_SIG __FUNCTION__
-#elif defined(__BORLANDC__) && (__BORLANDC__ >= 0x550)
-#define F_FUNC_SIG __FUNC__
-#elif defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901)
-#define F_FUNC_SIG __func__
-#elif defined(__cplusplus) && (__cplusplus >= 201103)
-#define F_FUNC_SIG __func__
-#else
-#define F_FUNC_SIG "F_FUNC_SIG unknown!"
-#endif
+	#if defined(__GNUC__) || (defined(__MWERKS__) && (__MWERKS__ >= 0x3000)) || (defined(__ICC) && (__ICC >= 600)) || defined(__ghs__)
+		#define F_FUNC_SIG __PRETTY_FUNCTION__
+	#elif defined(__DMC__) && (__DMC__ >= 0x810)
+		#define F_FUNC_SIG __PRETTY_FUNCTION__
+	#elif (defined(__FUNCSIG__) || (_MSC_VER))
+		#define F_FUNC_SIG __FUNCSIG__
+	#elif (defined(__INTEL_COMPILER) && (__INTEL_COMPILER >= 600)) || (defined(__IBMCPP__) && (__IBMCPP__ >= 500))
+		#define F_FUNC_SIG __FUNCTION__
+	#elif defined(__BORLANDC__) && (__BORLANDC__ >= 0x550)
+		#define F_FUNC_SIG __FUNC__
+	#elif defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901)
+		#define F_FUNC_SIG __func__
+	#elif defined(__cplusplus) && (__cplusplus >= 201103)
+		#define F_FUNC_SIG __func__
+	#else
+		#define F_FUNC_SIG "F_FUNC_SIG unknown!"
+	#endif
 
-#define F_PROFILE_BEGIN_SESSION(name, filepath) ::Fall::Instrumentor::Get().BeginSession(name, filepath)
-#define F_PROFILE_END_SESSION() ::Fall::Instrumentor::Get().EndSession()
-#define F_PROFILE_SCOPE_LINE2(name, line) constexpr auto fixedName##line = ::Fall::InstrumentorUtils::CleanupOutputString(name, "__cdecl ");\
-											   ::Fall::InstrumentationTimer timer##line(fixedName##line.Data)
-#define F_PROFILE_SCOPE_LINE(name, line) F_PROFILE_SCOPE_LINE2(name, line)
-#define F_PROFILE_SCOPE(name) F_PROFILE_SCOPE_LINE(name, __LINE__)
-#define F_PROFILE_FUNCTION() F_PROFILE_SCOPE(F_FUNC_SIG)
+	#define F_PROFILE_BEGIN_SESSION(name, filepath) ::Fall::Instrumentor::Get().BeginSession(name, filepath)
+	#define F_PROFILE_END_SESSION() ::Fall::Instrumentor::Get().EndSession()
+	#define F_PROFILE_SCOPE_LINE2(name, line) constexpr auto fixedName##line = ::Fall::InstrumentorUtils::CleanupOutputString(name, "__cdecl ");\
+													::Fall::InstrumentationTimer timer##line(fixedName##line.Data)
+	#define F_PROFILE_SCOPE_LINE(name, line) F_PROFILE_SCOPE_LINE2(name, line)
+	#define F_PROFILE_SCOPE(name) F_PROFILE_SCOPE_LINE(name, __LINE__)
+	#define F_PROFILE_FUNCTION() F_PROFILE_SCOPE(F_FUNC_SIG)
 #else
 #define F_PROFILE_BEGIN_SESSION(name, filepath)
 #define F_PROFILE_END_SESSION()

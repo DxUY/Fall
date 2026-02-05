@@ -8,16 +8,15 @@
 
 namespace Fall {
 
-    GPUComputePipeline::GPUComputePipeline(GPUContext& gpu)
-        : m_GPU(gpu) {
-    }
+    GPUComputePipeline::GPUComputePipeline(GPUContext& context)
+        : m_Context(context) {}
 
     GPUComputePipeline::~GPUComputePipeline() {
         FALL_ASSERT_GPU_THREAD();
 
         for (auto& [key, pipeline] : m_Pipelines) {
             if (pipeline) {
-                SDL_ReleaseGPUComputePipeline(m_GPU.GetDevice(), pipeline);
+                SDL_ReleaseGPUComputePipeline(m_Context.GetDevice(), pipeline);
             }
         }
 
@@ -50,7 +49,7 @@ namespace Fall {
         info.threadcount_y = key.threadsY;
         info.threadcount_z = key.threadsZ;
 
-        SDL_GPUComputePipeline* pipeline = SDL_CreateGPUComputePipeline(m_GPU.GetDevice(), &info);
+        SDL_GPUComputePipeline* pipeline = SDL_CreateGPUComputePipeline(m_Context.GetDevice(), &info);
 
         if (!pipeline) {
             FALL_CORE_ERROR("Failed to create Compute Pipeline: {0}", SDL_GetError());

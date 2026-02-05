@@ -7,13 +7,13 @@
 
 namespace Fall {
 
-    PipelineManager::PipelineManager(GPUContext& gpu)
-        : m_GPU(gpu) {
+    PipelineManager::PipelineManager(GPUContext& context)
+        : m_Context(context) {
 
         FALL_ASSERT_GPU_THREAD();
 
-        m_Graphics = CreateScope<GPUGraphicsPipeline>(gpu);
-        m_Compute = CreateScope<GPUComputePipeline>(gpu);
+        m_Graphics = CreateScope<GPUGraphicsPipeline>(context);
+        m_Compute = CreateScope<GPUComputePipeline>(context);
     }
 
     PipelineManager::~PipelineManager() = default;

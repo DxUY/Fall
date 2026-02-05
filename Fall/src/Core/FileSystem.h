@@ -9,7 +9,7 @@ namespace Fall {
 
 	class FileSystem {
 	public:
-		static Buffer     ReadFileBinary(const std::string& filepath);
+		static Buffer ReadFileBinary(const std::string& filepath);
 		static MappedFile MapFileBinary(const std::string& filepath);
 	};
 

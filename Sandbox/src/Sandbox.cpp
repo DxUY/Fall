@@ -3,16 +3,15 @@
 
 #include "Layers/EditorLayer.h"
 
-
-class Editor : public Fall::Application {
+class Sandbox : public Fall::Application {
 public:
-	Editor() {
+	Sandbox() {
 		
 	}
 
-	~Editor() {}
+	~Sandbox() {}
 };
 
 Fall::Application* Fall::CreateApplication() {
-	return new Editor();
+	return new Sandbox();
 }

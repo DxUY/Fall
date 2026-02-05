@@ -13,7 +13,7 @@ namespace Fall {
 
     class PipelineManager {
     public:
-        explicit PipelineManager(GPUContext& gpu);
+        explicit PipelineManager(GPUContext& context);
         ~PipelineManager();
 
         FALL_NON_COPYABLE(PipelineManager)
@@ -28,7 +28,7 @@ namespace Fall {
         GPUComputePipeline& GetComputeCache() { return *m_Compute; }
 
     private:
-        GPUContext& m_GPU;
+        GPUContext& m_Context;
 
         Scope<GPUGraphicsPipeline> m_Graphics;
         Scope<GPUComputePipeline>  m_Compute;

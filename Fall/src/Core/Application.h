@@ -7,6 +7,10 @@
 #include "Events/Event.h"
 #include "Events/ApplicationEvent.h"
 
+#include "Core/TimeStep.h"
+
+#include "ImGui/ImGuiLayer.h"
+
 namespace Fall {
 
     class Window;
@@ -26,15 +30,24 @@ namespace Fall {
         void PushLayer(Layer* layer);
         void PushOverlay(Layer* layer);
 
+        ImGuiLayer* GetImGuiLayer() { return m_ImGuiLayer; }
+        Renderer& GetRenderer() { return *m_Renderer; }
+
         static Application& Get() { return *s_Instance; }
+
         Window& GetWindow() { return *m_Window; }
 
     private:
-        bool OnWindowClose(WindowCloseEvent& e);
+        bool OnWindowClose(WindowCloseEvent&);
+		bool OnWindowResize(WindowResizeEvent&);
 
         Scope<Window> m_Window;
+		ImGuiLayer* m_ImGuiLayer;
+
         bool m_Running = true;
-        LayerStack m_layerStack;
+        bool m_Minimized = false;
+        LayerStack m_LayerStack;
+        float m_LastFrameTime = 0.0f;
 
 		Scope<Renderer> m_Renderer;
 

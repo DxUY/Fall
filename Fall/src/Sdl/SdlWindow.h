@@ -2,7 +2,7 @@
 
 #include "Core/Window.h"
 
-#include "SDL3/SDL.h"
+#include <SDL3/SDL.h>
 
 struct SDL_Window;
 

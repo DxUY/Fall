@@ -11,7 +11,6 @@
 #include "Renderer/Resource/Target/RenderTarget.h"
 
 namespace Fall {
-
     void ClearPass::Execute(GPUCommand& cmd, const FrameContext& frame) {
         BackbufferView backbuffer = frame.GetBackbuffer();
 

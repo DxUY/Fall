@@ -11,7 +11,7 @@ namespace Fall {
 
     class GPUBuffer {
     public:
-        GPUBuffer(GPUContext& gpu, const BufferDesc& desc);
+        GPUBuffer(GPUContext& context, const BufferDesc& desc);
         ~GPUBuffer();
 
         FALL_NON_COPYABLE(GPUBuffer)
@@ -26,7 +26,7 @@ namespace Fall {
         void Create();
 
     private:
-        GPUContext& m_GPU;
+        GPUContext& m_Context;
         BufferDesc m_Desc{};
         SDL_GPUBuffer* m_Native = nullptr;
     };

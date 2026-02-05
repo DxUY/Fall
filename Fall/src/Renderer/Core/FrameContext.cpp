@@ -1,7 +1,8 @@
 #include "FallPCH.h"
 #include "FrameContext.h"
 
-#include "Renderer/Pass/RenderPass.h"
+#include "Renderer/Pass/Pass.h"
+#include "Camera.h"
 #include "Renderer/GPU/GPUCommand.h"
 
 namespace Fall {
@@ -12,6 +13,8 @@ namespace Fall {
 		m_Command = nullptr;
 		m_Backbuffer = {};
 		m_Passes.clear();
+
+		m_Camera = nullptr;
 	}
 
 	void FrameContext::SetCommand(GPUCommand* command)
@@ -35,13 +38,12 @@ namespace Fall {
 		return m_Backbuffer;
 	}
 
-	void FrameContext::AddPass(RenderPass* pass)
-	{
+	void FrameContext::AddPass(Scope<Pass> pass) {
 		FALL_CORE_ASSERT(pass, "Null RenderPass");
-		m_Passes.push_back(pass);
+		m_Passes.push_back(std::move(pass));
 	}
 
-	const std::vector<RenderPass*>& FrameContext::GetPasses() const
+	const std::vector<Scope<Pass>>& FrameContext::GetPasses() const
 	{
 		return m_Passes;
 	}

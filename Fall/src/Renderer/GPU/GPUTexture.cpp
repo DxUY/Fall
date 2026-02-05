@@ -24,8 +24,8 @@ namespace Fall {
         }
     }
 
-    GPUTexture::GPUTexture(GPUContext& gpu, const TextureDesc& desc)
-        : m_GPU(gpu), m_Desc(desc) {
+    GPUTexture::GPUTexture(GPUContext& context, const TextureDesc& desc)
+        : m_Context(context), m_Desc(desc) {
 
         FALL_ASSERT_GPU_THREAD();
         FALL_CORE_ASSERT(desc.IsValid(), "Invalid TextureDesc");
@@ -37,7 +37,7 @@ namespace Fall {
         FALL_ASSERT_GPU_THREAD();
 
         if (m_Native) {
-            SDL_ReleaseGPUTexture(m_GPU.GetDevice(), m_Native);
+            SDL_ReleaseGPUTexture(m_Context.GetDevice(), m_Native);
             m_Native = nullptr;
         }
     }
@@ -58,7 +58,7 @@ namespace Fall {
         FALL_CORE_ASSERT(info.format != SDL_GPU_TEXTUREFORMAT_INVALID,
             "Unsupported texture format");
 
-        m_Native = SDL_CreateGPUTexture(m_GPU.GetDevice(), &info);
+        m_Native = SDL_CreateGPUTexture(m_Context.GetDevice(), &info);
         FALL_CORE_ASSERT(m_Native, "Failed to create GPU texture");
     }
 
@@ -70,7 +70,7 @@ namespace Fall {
             return;
 
         if (m_Native) {
-            SDL_ReleaseGPUTexture(m_GPU.GetDevice(), m_Native);
+            SDL_ReleaseGPUTexture(m_Context.GetDevice(), m_Native);
             m_Native = nullptr;
         }
 

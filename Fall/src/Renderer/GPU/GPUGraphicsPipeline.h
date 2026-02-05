@@ -15,7 +15,7 @@ namespace Fall {
 
     class GPUGraphicsPipeline {
     public:
-        GPUGraphicsPipeline(GPUContext& gpu);
+        GPUGraphicsPipeline(GPUContext& context);
         ~GPUGraphicsPipeline();
 
         FALL_NON_COPYABLE(GPUGraphicsPipeline)
@@ -26,7 +26,7 @@ namespace Fall {
         SDL_GPUGraphicsPipeline* GetInternal(const PipelineKey& key) const;
 
     private:
-        GPUContext& m_GPU;
+        GPUContext& m_Context;
 
         std::unordered_map<PipelineKey, SDL_GPUGraphicsPipeline*, PipelineKeyHash> m_Pipelines;
     };

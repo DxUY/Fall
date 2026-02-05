@@ -33,8 +33,7 @@ namespace Fall {
 		m_Data.DeltaX = m_Data.DeltaY = 0.0f;
 
 		if (s_SDLWindowCount == 0) {
-			int result = SDL_Init(SDL_INIT_VIDEO);
-			FALL_CORE_ASSERT(result == 0, "Failed to initialize SDL: {0}", SDL_GetError());
+			FALL_CORE_ASSERT(SDL_Init(SDL_INIT_VIDEO) == 0, "Failed to initialize SDL: {0}", SDL_GetError());
 		}
 
 		{

@@ -30,7 +30,8 @@ namespace Fall {
         m_Impl->Cmd = m_GPU.AcquireCommandBuffer();
 
         if (!m_Impl->Cmd) {
-            FALL_CORE_ERROR("Failed to acquire GPU command buffer");
+            const char* error = SDL_GetError();
+            FALL_CORE_ERROR("SDL_AcquireGPUCommandBuffer failed! Reason: {0}", error);
             m_Impl->Recording = false;
             return;
         }

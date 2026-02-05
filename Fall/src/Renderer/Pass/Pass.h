@@ -5,9 +5,9 @@ namespace Fall {
 	class GPUCommand;
 	class FrameContext;
 
-	class RenderPass {
+	class Pass {
 	public:
-		virtual ~RenderPass() = default;
+		virtual ~Pass() = default;
 
 		virtual void Execute(
 			GPUCommand& cmd,

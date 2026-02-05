@@ -9,14 +9,13 @@
 
 namespace Fall {
 
-    GPUShader::GPUShader(GPUContext& gpu,
+    GPUShader::GPUShader(GPUContext& context,
         const uint8_t* code,
         size_t codeSize,
         uint32_t format,
         uint32_t stage,
         const ShaderReflection& reflection)
-        : m_GPU(gpu)
-    {
+        : m_Context(context) {
         FALL_ASSERT_GPU_THREAD();
 
         SDL_GPUShaderCreateInfo info{};
@@ -35,14 +34,14 @@ namespace Fall {
         info.num_storage_buffers = static_cast<uint32_t>(
             reflection.readonlyStorageBuffers.size() + reflection.readwriteStorageBuffers.size());
 
-        m_Shader = SDL_CreateGPUShader(gpu.GetDevice(), &info);
+        m_Shader = SDL_CreateGPUShader(context.GetDevice(), &info);
 
         FALL_CORE_ASSERT(m_Shader, "Failed to create GPU shader: {0}", SDL_GetError());
     }
 
     GPUShader::~GPUShader() {
         if (m_Shader) {
-            SDL_ReleaseGPUShader(m_GPU.GetDevice(), m_Shader);
+            SDL_ReleaseGPUShader(m_Context.GetDevice(), m_Shader);
             m_Shader = nullptr;
         }
     }

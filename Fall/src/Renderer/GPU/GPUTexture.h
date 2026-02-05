@@ -11,7 +11,7 @@ namespace Fall {
 
     class GPUTexture {
     public:
-        GPUTexture(GPUContext& gpu, const TextureDesc& desc);
+        GPUTexture(GPUContext& context, const TextureDesc& desc);
         ~GPUTexture();
 
         FALL_NON_COPYABLE(GPUTexture)
@@ -25,7 +25,7 @@ namespace Fall {
         void Create();
 
     private:
-        GPUContext& m_GPU;
+        GPUContext& m_Context;
         TextureDesc m_Desc{};
         SDL_GPUTexture* m_Native = nullptr;
     };

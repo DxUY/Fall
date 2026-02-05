@@ -1,5 +1,9 @@
 #pragma once
 
+#include "Core/Base.h"
+#include "Core/Timestep.h"
+#include "Events/Event.h"
+
 #include <string>
 
 namespace Fall {
@@ -13,9 +17,9 @@ namespace Fall {
 
 		virtual void OnAttach() {}
 		virtual void OnDetach() {}
-		virtual void OnUpdate() {}
+		virtual void OnUpdate(Timestep) {}
 		virtual void OnImGuiRender() {}
-		virtual void OnEvent(Event& event) {}
+		virtual void OnEvent(Event&) {}
 
 		const std::string& GetName() const { return m_DebugName; }
 	protected:

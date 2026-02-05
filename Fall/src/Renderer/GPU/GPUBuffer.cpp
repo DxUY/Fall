@@ -13,8 +13,8 @@ namespace Fall {
             );
     }
 
-    GPUBuffer::GPUBuffer(GPUContext& gpu, const BufferDesc& desc)
-        : m_GPU(gpu), m_Desc(desc) {
+    GPUBuffer::GPUBuffer(GPUContext& context, const BufferDesc& desc)
+        : m_Context(context), m_Desc(desc) {
 
         FALL_ASSERT_GPU_THREAD();
         Create();
@@ -24,7 +24,7 @@ namespace Fall {
         FALL_ASSERT_GPU_THREAD();
 
         if (m_Native) {
-            SDL_ReleaseGPUBuffer(m_GPU.GetDevice(), m_Native);
+            SDL_ReleaseGPUBuffer(m_Context.GetDevice(), m_Native);
             m_Native = nullptr;
         }
     }
@@ -42,7 +42,7 @@ namespace Fall {
         info.size = m_Desc.size;
         info.usage = ToSDLUsage(m_Desc.usage);
 
-        m_Native = SDL_CreateGPUBuffer(m_GPU.GetDevice(), &info);
+        m_Native = SDL_CreateGPUBuffer(m_Context.GetDevice(), &info);
 
         FALL_ASSERT(m_Native, "Failed to create GPU buffer");
     }
@@ -55,7 +55,7 @@ namespace Fall {
             return;
 
         if (m_Native) {
-            SDL_ReleaseGPUBuffer(m_GPU.GetDevice(), m_Native);
+            SDL_ReleaseGPUBuffer(m_Context.GetDevice(), m_Native);
             m_Native = nullptr;
         }
 

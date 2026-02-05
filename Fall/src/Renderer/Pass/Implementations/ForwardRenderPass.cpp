@@ -14,8 +14,7 @@
 namespace Fall {
 
     ForwardRenderPass::ForwardRenderPass(PipelineManager& pipelineMgr)
-        : m_PipelineMgr(pipelineMgr) {
-    }
+        : m_PipelineMgr(pipelineMgr) {}
 
     void ForwardRenderPass::Submit(const RenderItem& item) {
         FALL_ASSERT_GPU_THREAD();

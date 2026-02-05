@@ -8,8 +8,8 @@
 
 namespace Fall {
 
-    GPUGraphicsPipeline::GPUGraphicsPipeline(GPUContext& gpu)
-        : m_GPU(gpu) {
+    GPUGraphicsPipeline::GPUGraphicsPipeline(GPUContext& context)
+        : m_Context(context) {
     }
 
     GPUGraphicsPipeline::~GPUGraphicsPipeline() {
@@ -17,7 +17,7 @@ namespace Fall {
 
         for (auto& [key, pipeline] : m_Pipelines) {
             if (pipeline) {
-                SDL_ReleaseGPUGraphicsPipeline(m_GPU.GetDevice(), pipeline);
+                SDL_ReleaseGPUGraphicsPipeline(m_Context.GetDevice(), pipeline);
             }
         }
 
@@ -64,7 +64,7 @@ namespace Fall {
         info.vertex_shader = key.vertexShader->Get().GetNative();
         info.fragment_shader = key.fragmentShader->Get().GetNative();
 
-        SDL_GPUGraphicsPipeline* pipeline = SDL_CreateGPUGraphicsPipeline(m_GPU.GetDevice(), &info);
+        SDL_GPUGraphicsPipeline* pipeline = SDL_CreateGPUGraphicsPipeline(m_Context.GetDevice(), &info);
 
         if (!pipeline) {
             FALL_CORE_ERROR("Failed to create graphics pipeline: {0}", SDL_GetError());

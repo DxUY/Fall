@@ -29,6 +29,10 @@
 
 #include "Core/Base.h"
 
+#include "DebugTools/Log.h"
+
+#include "DebugTools/Instrumentor.h"
+
 #ifdef FALL_PLATFORM_WINDOWS
 	#include <Windows.h>
 
