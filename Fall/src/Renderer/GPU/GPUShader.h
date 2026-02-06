@@ -26,7 +26,11 @@ namespace Fall {
             SDL_GPUShader* GetNative() const { return m_Shader; }
 
     private:
+        void ReleaseInternal();
+
+    private:
         GPUContext& m_Context;
         SDL_GPUShader* m_Shader = nullptr;
     };
+
 }

@@ -9,18 +9,12 @@
 namespace Fall {
 
     GPUComputePipeline::GPUComputePipeline(GPUContext& context)
-        : m_Context(context) {}
+        : m_Context(context) {
+    }
 
     GPUComputePipeline::~GPUComputePipeline() {
         FALL_ASSERT_GPU_THREAD();
-
-        for (auto& [key, pipeline] : m_Pipelines) {
-            if (pipeline) {
-                SDL_ReleaseGPUComputePipeline(m_Context.GetDevice(), pipeline);
-            }
-        }
-
-        m_Pipelines.clear();
+        ReleaseInternal();
     }
 
     bool GPUComputePipeline::HasPipeline(const PipelineKey& key) const {
@@ -49,6 +43,12 @@ namespace Fall {
         info.threadcount_y = key.threadsY;
         info.threadcount_z = key.threadsZ;
 
+        info.num_readonly_storage_textures = static_cast<uint32_t>(shader.GetReflection().readonlyStorageTextures.size());
+        info.num_readonly_storage_buffers = static_cast<uint32_t>(shader.GetReflection().readonlyStorageBuffers.size());
+        info.num_readwrite_storage_textures = static_cast<uint32_t>(shader.GetReflection().readwriteStorageTextures.size());
+        info.num_readwrite_storage_buffers = static_cast<uint32_t>(shader.GetReflection().readwriteStorageBuffers.size());
+        info.num_uniform_buffers = static_cast<uint32_t>(shader.GetReflection().uniformBuffers.size());
+
         SDL_GPUComputePipeline* pipeline = SDL_CreateGPUComputePipeline(m_Context.GetDevice(), &info);
 
         if (!pipeline) {
@@ -57,6 +57,23 @@ namespace Fall {
         }
 
         m_Pipelines.emplace(key, pipeline);
+    }
+
+    void GPUComputePipeline::ReleaseInternal() {
+        if (m_Pipelines.empty()) return;
+
+        auto pipelinesToRelease = std::move(m_Pipelines);
+        SDL_GPUDevice* device = m_Context.GetDevice();
+
+        m_Context.EnqueueDeletion([device, pipelines = std::move(pipelinesToRelease)]() {
+            for (auto& [key, pipeline] : pipelines) {
+                if (pipeline) {
+                    SDL_ReleaseGPUComputePipeline(device, pipeline);
+                }
+            }
+            });
+
+        m_Pipelines.clear();
     }
 
     SDL_GPUComputePipeline* GPUComputePipeline::GetInternal(const PipelineKey& key) const {

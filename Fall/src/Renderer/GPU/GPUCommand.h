@@ -4,6 +4,7 @@
 #include <cstdint>
 
 struct SDL_GPUCommandBuffer;
+struct SDL_GPUFence;
 
 namespace Fall {
 
@@ -26,6 +27,7 @@ namespace Fall {
         void PushComputeUniform(uint32_t slot, const void* data, uint32_t size);
 
         SDL_GPUCommandBuffer* GetNative() const;
+        SDL_GPUFence* GetLastFence() const;
 
     private:
         struct Impl;

@@ -1,8 +1,8 @@
 #include "FallPCH.h"
-
 #include "GPUShader.h"
 
 #include "GPUContext.h"
+
 #include "Renderer/Resource/Shader/ShaderReflection.h" 
 
 #include <SDL3/SDL_gpu.h>
@@ -40,9 +40,21 @@ namespace Fall {
     }
 
     GPUShader::~GPUShader() {
+        FALL_ASSERT_GPU_THREAD();
+        ReleaseInternal();
+    }
+
+    void GPUShader::ReleaseInternal() {
         if (m_Shader) {
-            SDL_ReleaseGPUShader(m_Context.GetDevice(), m_Shader);
+            SDL_GPUDevice* device = m_Context.GetDevice();
+            SDL_GPUShader* shader = m_Shader;
+
+            m_Context.EnqueueDeletion([device, shader]() {
+                SDL_ReleaseGPUShader(device, shader);
+                });
+
             m_Shader = nullptr;
         }
     }
+
 }

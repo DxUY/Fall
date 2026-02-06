@@ -20,14 +20,16 @@ namespace Fall {
 
         FALL_NON_COPYABLE(GPUGraphicsPipeline)
 
-        void Create(const PipelineKey& key);
+            void Create(const PipelineKey& key);
         bool HasPipeline(const PipelineKey& key) const;
 
         SDL_GPUGraphicsPipeline* GetInternal(const PipelineKey& key) const;
 
     private:
-        GPUContext& m_Context;
+        void ReleaseInternal();
 
+    private:
+        GPUContext& m_Context;
         std::unordered_map<PipelineKey, SDL_GPUGraphicsPipeline*, PipelineKeyHash> m_Pipelines;
     };
 

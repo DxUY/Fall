@@ -23,6 +23,7 @@ namespace Fall {
 
     private:
         void Create();
+        void ReleaseInternal();
 
     private:
         GPUContext& m_Context;

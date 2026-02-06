@@ -35,11 +35,7 @@ namespace Fall {
 
     GPUTexture::~GPUTexture() {
         FALL_ASSERT_GPU_THREAD();
-
-        if (m_Native) {
-            SDL_ReleaseGPUTexture(m_Context.GetDevice(), m_Native);
-            m_Native = nullptr;
-        }
+        ReleaseInternal();
     }
 
     void GPUTexture::Create() {
@@ -62,6 +58,19 @@ namespace Fall {
         FALL_CORE_ASSERT(m_Native, "Failed to create GPU texture");
     }
 
+    void GPUTexture::ReleaseInternal() {
+        if (m_Native) {
+            SDL_GPUDevice* device = m_Context.GetDevice();
+            SDL_GPUTexture* texture = m_Native;
+
+            m_Context.EnqueueDeletion([device, texture]() {
+                SDL_ReleaseGPUTexture(device, texture);
+                });
+
+            m_Native = nullptr;
+        }
+    }
+
     void GPUTexture::Resize(const TextureDesc& newDesc) {
         FALL_ASSERT_GPU_THREAD();
         FALL_CORE_ASSERT(newDesc.IsValid(), "Invalid TextureDesc");
@@ -69,10 +78,7 @@ namespace Fall {
         if (newDesc == m_Desc)
             return;
 
-        if (m_Native) {
-            SDL_ReleaseGPUTexture(m_Context.GetDevice(), m_Native);
-            m_Native = nullptr;
-        }
+        ReleaseInternal();
 
         m_Desc = newDesc;
         Create();

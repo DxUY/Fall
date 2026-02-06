@@ -8,25 +8,18 @@
 namespace Fall {
 
     static SDL_GPUBufferUsageFlags ToSDLUsage(BufferUsage usage) {
-        return static_cast<SDL_GPUBufferUsageFlags>(
-            static_cast<uint32_t>(usage)
-            );
+        return static_cast<SDL_GPUBufferUsageFlags>(static_cast<uint32_t>(usage));
     }
 
     GPUBuffer::GPUBuffer(GPUContext& context, const BufferDesc& desc)
         : m_Context(context), m_Desc(desc) {
-
         FALL_ASSERT_GPU_THREAD();
         Create();
     }
 
     GPUBuffer::~GPUBuffer() {
         FALL_ASSERT_GPU_THREAD();
-
-        if (m_Native) {
-            SDL_ReleaseGPUBuffer(m_Context.GetDevice(), m_Native);
-            m_Native = nullptr;
-        }
+        ReleaseInternal();
     }
 
     SDL_GPUBuffer* GPUBuffer::GetNative() const {
@@ -43,21 +36,28 @@ namespace Fall {
         info.usage = ToSDLUsage(m_Desc.usage);
 
         m_Native = SDL_CreateGPUBuffer(m_Context.GetDevice(), &info);
-
         FALL_ASSERT(m_Native, "Failed to create GPU buffer");
+    }
+
+    void GPUBuffer::ReleaseInternal() {
+        if (m_Native) {
+            SDL_GPUDevice* device = m_Context.GetDevice();
+            SDL_GPUBuffer* buffer = m_Native;
+
+            m_Context.EnqueueDeletion([device, buffer]() {
+                SDL_ReleaseGPUBuffer(device, buffer);
+                });
+
+            m_Native = nullptr;
+        }
     }
 
     void GPUBuffer::Resize(const BufferDesc& newDesc) {
         FALL_ASSERT_GPU_THREAD();
 
-        if (newDesc.size <= m_Desc.size &&
-            newDesc.usage == m_Desc.usage)
-            return;
+        if (newDesc.size <= m_Desc.size && newDesc.usage == m_Desc.usage) return;
 
-        if (m_Native) {
-            SDL_ReleaseGPUBuffer(m_Context.GetDevice(), m_Native);
-            m_Native = nullptr;
-        }
+        ReleaseInternal();
 
         m_Desc = newDesc;
         Create();

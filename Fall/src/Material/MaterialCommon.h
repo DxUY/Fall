@@ -4,33 +4,31 @@
 namespace Fall {
 
     enum class MatterPhase : uint32_t {
-        Solid,   
-        Liquid,  
-        Gas,     
-        Plasma  
+        Solid, 
+        Liquid, 
+        Gas, 
+        Plasma
     };
 
-    // Aligned to 16-byte boundaries for GPU SSBO performance
     struct MaterialDescriptor {
-        // --- Physical State ---
-        float Density;             // kg/m^3
-        float Friction;            // Movement resistance
-        float MeltingPoint;        // Temp where Solid -> Liquid
-        float BoilingPoint;        // Temp where Liquid -> Gas
+        float Density = 1.0f;
+        float Friction = 0.5f;
+        float MeltingPoint = 1000.0f;
+        float BoilingPoint = 2000.0f;
 
-        // --- Simulation Rules ---
-        float ThermalConductivity;
-        uint32_t DefaultPhase;     // MatterPhase enum cast to uint
-        float Viscosity;           // For Liquids
-        float GravityScale;        // Buoyancy/Weight factor
+        float ThermalConductivity = 0.1f;
+        uint32_t DefaultPhase = 0;
+        float Viscosity = 0.5f;
+        float GravityScale = 1.0f;
 
-        // --- Visual Intent ---
-        float BaseColor[4];        // RGBA
-        float Roughness;
-        float Emissive;
-        uint32_t VisualType;       // 0: Opaque, 1: Translucent, 2: Additive
-        uint32_t TextureID;        // Index into Global Array
+        float BaseColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 
-        float _padding[2];         // Pad to 80 bytes (multiple of 16)
+        float Roughness = 0.5f;
+        float Emissive = 0.0f;
+        uint32_t VisualType = 0; 
+        uint32_t TextureID = 0;
     };
+
+    static_assert(sizeof(MaterialDescriptor) % 16 == 0, "MaterialDescriptor alignment error!");
+
 }

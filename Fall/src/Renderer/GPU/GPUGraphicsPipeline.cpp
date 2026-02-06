@@ -2,6 +2,7 @@
 #include "GPUGraphicsPipeline.h"
 
 #include "GPUContext.h"
+
 #include "Renderer/Resource/Shader/GraphicsShader.h"
 
 #include <SDL3/SDL_gpu.h>
@@ -14,14 +15,7 @@ namespace Fall {
 
     GPUGraphicsPipeline::~GPUGraphicsPipeline() {
         FALL_ASSERT_GPU_THREAD();
-
-        for (auto& [key, pipeline] : m_Pipelines) {
-            if (pipeline) {
-                SDL_ReleaseGPUGraphicsPipeline(m_Context.GetDevice(), pipeline);
-            }
-        }
-
-        m_Pipelines.clear();
+        ReleaseInternal();
     }
 
     bool GPUGraphicsPipeline::HasPipeline(const PipelineKey& key) const {
@@ -32,28 +26,19 @@ namespace Fall {
         FALL_ASSERT_GPU_THREAD();
 
         if (HasPipeline(key)) return;
-
         if (!key.vertexShader || !key.fragmentShader || key.targetFormat == 0) return;
 
         SDL_GPUColorTargetDescription colorTarget{};
-        colorTarget.format =
-            static_cast<SDL_GPUTextureFormat>(key.targetFormat);
+        colorTarget.format = static_cast<SDL_GPUTextureFormat>(key.targetFormat);
 
         if (key.useBlending) {
             colorTarget.blend_state.enable_blend = true;
-            colorTarget.blend_state.src_color_blendfactor =
-                SDL_GPU_BLENDFACTOR_SRC_ALPHA;
-            colorTarget.blend_state.dst_color_blendfactor =
-                SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
-            colorTarget.blend_state.color_blend_op =
-                SDL_GPU_BLENDOP_ADD;
-
-            colorTarget.blend_state.src_alpha_blendfactor =
-                SDL_GPU_BLENDFACTOR_ONE;
-            colorTarget.blend_state.dst_alpha_blendfactor =
-                SDL_GPU_BLENDFACTOR_ZERO;
-            colorTarget.blend_state.alpha_blend_op =
-                SDL_GPU_BLENDOP_ADD;
+            colorTarget.blend_state.src_color_blendfactor = SDL_GPU_BLENDFACTOR_SRC_ALPHA;
+            colorTarget.blend_state.dst_color_blendfactor = SDL_GPU_BLENDFACTOR_ONE_MINUS_SRC_ALPHA;
+            colorTarget.blend_state.color_blend_op = SDL_GPU_BLENDOP_ADD;
+            colorTarget.blend_state.src_alpha_blendfactor = SDL_GPU_BLENDFACTOR_ONE;
+            colorTarget.blend_state.dst_alpha_blendfactor = SDL_GPU_BLENDFACTOR_ZERO;
+            colorTarget.blend_state.alpha_blend_op = SDL_GPU_BLENDOP_ADD;
         }
 
         SDL_GPUGraphicsPipelineCreateInfo info{};
@@ -72,6 +57,23 @@ namespace Fall {
         }
 
         m_Pipelines.emplace(key, pipeline);
+    }
+
+    void GPUGraphicsPipeline::ReleaseInternal() {
+        if (m_Pipelines.empty()) return;
+
+        auto pipelinesToRelease = std::move(m_Pipelines);
+        SDL_GPUDevice* device = m_Context.GetDevice();
+
+        m_Context.EnqueueDeletion([device, pipelines = std::move(pipelinesToRelease)]() {
+            for (auto& [key, pipeline] : pipelines) {
+                if (pipeline) {
+                    SDL_ReleaseGPUGraphicsPipeline(device, pipeline);
+                }
+            }
+            });
+
+        m_Pipelines.clear();
     }
 
     SDL_GPUGraphicsPipeline* GPUGraphicsPipeline::GetInternal(const PipelineKey& key) const {

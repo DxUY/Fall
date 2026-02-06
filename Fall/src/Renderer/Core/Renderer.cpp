@@ -16,6 +16,7 @@ namespace Fall {
 
     void Renderer::BeginFrame() {
         FALL_ASSERT_GPU_THREAD();
+
         m_Frame.Reset(++m_FrameIndex);
         m_Command->Begin();
 
@@ -29,6 +30,8 @@ namespace Fall {
         FALL_ASSERT_GPU_THREAD();
         ExecuteFrame(m_Frame);
         m_Command->End();
+
+        m_GPU.SyncCleanup(m_Command->GetLastFence());
     }
 
     void Renderer::ExecuteFrame(FrameContext& frame) {

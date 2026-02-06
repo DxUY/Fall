@@ -1,17 +1,19 @@
 #pragma once
-
 #include "Renderer/Resource/Pipeline/PipelineKey.h"
-
 #include <vector>
 #include <cstdint>
 
 namespace Fall {
-
     class GPUBuffer;
     class GPUTexture;
 
     struct RenderItem {
         PipelineKey pipelineKey;
+
+        uint16_t primaryMaterialID = 0;
+        uint16_t secondaryMaterialID = 0;
+        float materialBlend = 0.0f;
+        float customData = 0.0f; 
 
         GPUBuffer* vertexBuffer = nullptr;
         GPUBuffer* indexBuffer = nullptr;
@@ -23,7 +25,6 @@ namespace Fall {
 
         bool indexed = false;
 
-        // Resource Bindings
         std::vector<GPUTexture*> vertexTextures;
         std::vector<GPUTexture*> fragmentTextures;
     };

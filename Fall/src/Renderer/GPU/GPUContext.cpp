@@ -1,4 +1,7 @@
+#include "FallPCH.h"
 #include "GPUContext.h"
+
+#include <SDL3/SDL_gpu.h>
 
 namespace Fall {
 
@@ -59,6 +62,18 @@ namespace Fall {
         if (!m_Device || !m_Window) return SDL_GPU_TEXTUREFORMAT_INVALID;
         return SDL_GetGPUSwapchainTextureFormat(m_Device, m_Window);
 	}
+
+    void GPUContext::EnqueueDeletion(std::function<void()>&& deallocator) {
+        m_DeletionQueue.Push(std::move(deallocator));
+    }
+
+    void GPUContext::SyncCleanup(SDL_GPUFence* fence) {
+        if (fence) {
+            SDL_WaitForGPUFences(m_Device, true, &fence, 1);
+        }
+
+        m_DeletionQueue.Flush();
+    }
 
     void GPUContext::Shutdown() {
         if (!m_Device) return;

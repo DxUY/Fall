@@ -26,8 +26,10 @@ namespace Fall {
         SDL_GPUComputePipeline* GetInternal(const PipelineKey& key) const;
 
     private:
-        GPUContext& m_Context;
+        void ReleaseInternal();
 
+    private:
+        GPUContext& m_Context;
         std::unordered_map<PipelineKey, SDL_GPUComputePipeline*, PipelineKeyHash> m_Pipelines;
     };
 

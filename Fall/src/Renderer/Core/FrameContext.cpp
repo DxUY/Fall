@@ -39,7 +39,7 @@ namespace Fall {
 	}
 
 	void FrameContext::AddPass(Scope<Pass> pass) {
-		FALL_CORE_ASSERT(pass, "Null RenderPass");
+		FALL_CORE_ASSERT(pass, "Null Pass");
 		m_Passes.push_back(std::move(pass));
 	}
 

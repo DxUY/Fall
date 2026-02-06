@@ -15,7 +15,6 @@ namespace Fall {
         FALL_ASSERT_GPU_THREAD();
         const auto* colorInfo = static_cast<const SDL_GPUColorTargetInfo*>(target.GetNativeInfo());
 
-        // Assuming 1 color target for now based on your previous code
         m_Pass = SDL_BeginGPURenderPass(cmd.GetNative(), colorInfo, 1, nullptr);
         FALL_CORE_ASSERT(m_Pass, "Failed to begin GPU render pass: {0}", SDL_GetError());
     }
