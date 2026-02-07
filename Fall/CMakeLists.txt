@@ -13,6 +13,8 @@ include(src/Sdl/Sdl.cmake)
 include(src/Renderer/Renderer.cmake)
 include(src/Utils/Utils.cmake)
 
+configure_fall_target(Fall)
+
 target_include_directories(Fall PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${CMAKE_CURRENT_SOURCE_DIR}/vendor/glm

@@ -12,6 +12,8 @@ namespace Fall {
         FALL_CORE_ASSERT(!s_Instance, "Application already exists!");
         s_Instance = this;
 
+        SetGPUThreadID();
+
         m_Window = Scope<Window>(Window::Create());
         m_Window->SetEventCallback(FALL_BIND_EVENT_FN(OnEvent));
 

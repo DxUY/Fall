@@ -13,7 +13,7 @@ namespace Fall {
         FALL_CORE_ASSERT(cmd.IsRecording(), "Debug label outside recording");
         FALL_CORE_ASSERT(name, "Null debug label");
 
-        SDL_PushGPUCommandBufferDebugGroup(cmd.GetNative(), name);
+        SDL_PushGPUDebugGroup(cmd.GetNative(), name);
 #else
         (void)cmd; (void)name;
 #endif
@@ -25,7 +25,7 @@ namespace Fall {
         FALL_ASSERT_GPU_THREAD();
         FALL_CORE_ASSERT(cmd.IsRecording(), "Debug pop outside recording");
 
-        SDL_PopGPUCommandBufferDebugGroup(cmd.GetNative());
+        SDL_PopGPUDebugGroup(cmd.GetNative());
 #else
         (void)cmd;
 #endif

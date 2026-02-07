@@ -6,7 +6,6 @@
 
 struct SDL_Window;
 
-struct SDL_Window;
 struct SDL_GPUDevice;
 struct SDL_GPUCommandBuffer;
 struct SDL_GPUFence;

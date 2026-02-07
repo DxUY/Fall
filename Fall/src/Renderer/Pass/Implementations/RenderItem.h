@@ -10,11 +10,6 @@ namespace Fall {
     struct RenderItem {
         PipelineKey pipelineKey;
 
-        uint16_t primaryMaterialID = 0;
-        uint16_t secondaryMaterialID = 0;
-        float materialBlend = 0.0f;
-        float customData = 0.0f; 
-
         GPUBuffer* vertexBuffer = nullptr;
         GPUBuffer* indexBuffer = nullptr;
 
