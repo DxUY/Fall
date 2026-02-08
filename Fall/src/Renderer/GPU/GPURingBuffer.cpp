@@ -46,14 +46,19 @@ namespace Fall {
     uint32_t GPURingBuffer::Push(GPUCommand& cmd, const void* data, uint32_t size) {
         FALL_ASSERT_GPU_THREAD();
 
-        if (!m_MappedData || size == 0) return 0;
+        if (!m_MappedData || size == 0) return UINT32_MAX;
+
+        if (!data) {
+            FALL_CORE_ERROR("GPURingBuffer::Push called with null data!");
+            FALL_ASSERT(false, "GPURingBuffer::Push data is null");
+            return UINT32_MAX;
+        }
 
         uint32_t alignedOffset = (m_CurrentOffset + (ALIGNMENT - 1)) & ~(ALIGNMENT - 1);
 
         if (alignedOffset + size > m_TotalSize) {
-            FALL_CORE_ERROR("GPURingBuffer Overflow! Increase buffer size.");
-            FALL_ASSERT(false, "Ring Buffer Overflow!");
-            return 0;
+            FALL_CORE_ERROR("GPURingBuffer Overflow!");
+            return UINT32_MAX;
         }
 
         m_CurrentOffset = alignedOffset;
@@ -62,6 +67,11 @@ namespace Fall {
         memcpy(m_MappedData + writeOffset, data, size);
 
         SDL_GPUCopyPass* copyPass = SDL_BeginGPUCopyPass(cmd.GetNative());
+        if (!copyPass) {
+            FALL_CORE_ERROR("Failed to begin GPU copy pass: {0}", SDL_GetError());
+            return UINT32_MAX;
+        }
+
         SDL_GPUTransferBufferLocation src{ m_TransferBuffer, writeOffset };
         SDL_GPUBufferRegion dst{ m_BackingBuffer->GetNative(), writeOffset, size };
 

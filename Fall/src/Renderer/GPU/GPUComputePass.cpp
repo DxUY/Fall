@@ -22,6 +22,9 @@ namespace Fall {
     void GPUComputePass::BindStorageBuffers(uint32_t firstSlot, GPUBuffer** buffers, uint32_t count) {
         if (count == 0 || !buffers) return;
 
+        FALL_CORE_ASSERT(count <= MAX_COMPUTE_BINDINGS,
+            "BindStorageBuffers count ({0}) exceeds MAX_COMPUTE_BINDINGS ({1})!", count, MAX_COMPUTE_BINDINGS);
+
         uint32_t actualCount = (count > MAX_COMPUTE_BINDINGS) ? MAX_COMPUTE_BINDINGS : count;
         SDL_GPUBuffer* natives[MAX_COMPUTE_BINDINGS];
 
@@ -34,6 +37,9 @@ namespace Fall {
 
     void GPUComputePass::BindStorageTextures(uint32_t firstSlot, GPUTexture** textures, uint32_t count) {
         if (count == 0 || !textures) return;
+
+        FALL_CORE_ASSERT(count <= MAX_COMPUTE_BINDINGS,
+            "BindStorageTextures count ({0}) exceeds MAX_COMPUTE_BINDINGS ({1})!", count, MAX_COMPUTE_BINDINGS);
 
         uint32_t actualCount = (count > MAX_COMPUTE_BINDINGS) ? MAX_COMPUTE_BINDINGS : count;
         SDL_GPUTexture* natives[MAX_COMPUTE_BINDINGS];

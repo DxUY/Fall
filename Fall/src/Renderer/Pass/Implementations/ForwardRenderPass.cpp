@@ -33,8 +33,9 @@ namespace Fall {
 
             auto* texA = (a.textureCount > 0) ? a.fragmentTextures[0] : nullptr;
             auto* texB = (b.textureCount > 0) ? b.fragmentTextures[0] : nullptr;
-            return texA < texB;
-            });
+
+            return std::less<GPUTexture*>{}(texA, texB);
+        });
 
         const auto& backbuffer = frame.GetBackbuffer();
         if (!backbuffer.IsValid()) return;

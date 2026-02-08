@@ -12,7 +12,7 @@ namespace Fall {
     class GPUBuffer;
     class GPUTexture;
 
-    static constexpr uint32_t MAX_COMPUTE_BINDINGS = 8;
+    constexpr uint32_t MAX_COMPUTE_BINDINGS = 8;
 
     class GPUComputePass {
     public:
