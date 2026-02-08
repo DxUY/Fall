@@ -30,4 +30,5 @@ namespace Fall {
         BufferDesc m_Desc{};
         SDL_GPUBuffer* m_Native = nullptr;
     };
+
 }

@@ -6,6 +6,7 @@
 #include "Utils/PlatformUtils.h"
 
 namespace Fall {
+
     Application* Application::s_Instance = nullptr;
 
     Application::Application() {

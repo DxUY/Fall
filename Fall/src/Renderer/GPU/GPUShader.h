@@ -12,13 +12,7 @@ namespace Fall {
 
     class GPUShader {
     public:
-        GPUShader(GPUContext& gpu,
-            const uint8_t* code,
-            size_t codeSize,
-            uint32_t format,
-            uint32_t stage,
-            const ShaderReflection& reflection);
-
+        GPUShader(GPUContext& gpu, const uint8_t* code, size_t codeSize, uint32_t format, uint32_t stage, const ShaderReflection& reflection);
         ~GPUShader();
 
         FALL_NON_COPYABLE(GPUShader)

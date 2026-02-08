@@ -9,12 +9,7 @@
 
 namespace Fall {
 
-    GPUShader::GPUShader(GPUContext& context,
-        const uint8_t* code,
-        size_t codeSize,
-        uint32_t format,
-        uint32_t stage,
-        const ShaderReflection& reflection)
+    GPUShader::GPUShader(GPUContext& context, const uint8_t* code, size_t codeSize, uint32_t format, uint32_t stage, const ShaderReflection& reflection)
         : m_Context(context) {
         FALL_ASSERT_GPU_THREAD();
 

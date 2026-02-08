@@ -10,6 +10,7 @@
 namespace Fall {
 
     GPUComputePass::GPUComputePass(GPUCommand& cmd) : m_Cmd(cmd) {
+        FALL_ASSERT_GPU_THREAD();
         m_Pass = SDL_BeginGPUComputePass(cmd.GetNative(), nullptr, 0, nullptr, 0);
         FALL_CORE_ASSERT(m_Pass, "Failed to begin Compute Pass");
     }
@@ -18,44 +19,30 @@ namespace Fall {
         if (pipeline) SDL_BindGPUComputePipeline(m_Pass, pipeline);
     }
 
-    void GPUComputePass::BindStorageBuffers(uint32_t firstSlot, const std::vector<GPUBuffer*>& buffers) {
-        std::vector<SDL_GPUBuffer*> natives;
-        natives.reserve(buffers.size());
+    void GPUComputePass::BindStorageBuffers(uint32_t firstSlot, GPUBuffer** buffers, uint32_t count) {
+        if (count == 0 || !buffers) return;
 
-        for (auto* buf : buffers) {
-            if (buf) {
-                natives.push_back(buf->GetNative());
-            }
+        uint32_t actualCount = (count > MAX_COMPUTE_BINDINGS) ? MAX_COMPUTE_BINDINGS : count;
+        SDL_GPUBuffer* natives[MAX_COMPUTE_BINDINGS];
+
+        for (uint32_t i = 0; i < actualCount; ++i) {
+            natives[i] = buffers[i] ? buffers[i]->GetNative() : nullptr;
         }
 
-        if (!natives.empty()) {
-            SDL_BindGPUComputeStorageBuffers(
-                m_Pass,
-                firstSlot,
-                natives.data(),
-                static_cast<uint32_t>(natives.size())
-            );
-        }
+        SDL_BindGPUComputeStorageBuffers(m_Pass, firstSlot, natives, actualCount);
     }
 
-    void GPUComputePass::BindStorageTextures(uint32_t firstSlot, const std::vector<GPUTexture*>& textures) {
-        std::vector<SDL_GPUTexture*> natives;
-        natives.reserve(textures.size());
+    void GPUComputePass::BindStorageTextures(uint32_t firstSlot, GPUTexture** textures, uint32_t count) {
+        if (count == 0 || !textures) return;
 
-        for (auto* tex : textures) {
-            if (tex) {
-                natives.push_back(tex->GetNative());
-            }
+        uint32_t actualCount = (count > MAX_COMPUTE_BINDINGS) ? MAX_COMPUTE_BINDINGS : count;
+        SDL_GPUTexture* natives[MAX_COMPUTE_BINDINGS];
+
+        for (uint32_t i = 0; i < actualCount; ++i) {
+            natives[i] = textures[i] ? textures[i]->GetNative() : nullptr;
         }
 
-        if (!natives.empty()) {
-            SDL_BindGPUComputeStorageTextures(
-                m_Pass,
-                firstSlot,
-                natives.data(),
-                static_cast<uint32_t>(natives.size())
-            );
-        }
+        SDL_BindGPUComputeStorageTextures(m_Pass, firstSlot, natives, actualCount);
     }
 
     void GPUComputePass::Dispatch(uint32_t x, uint32_t y, uint32_t z) {
@@ -65,4 +52,5 @@ namespace Fall {
     GPUComputePass::~GPUComputePass() {
         if (m_Pass) SDL_EndGPUComputePass(m_Pass);
     }
+
 }

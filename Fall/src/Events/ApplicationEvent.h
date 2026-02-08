@@ -4,6 +4,7 @@
 #include <sstream>
 
 namespace Fall {
+
 	class WindowResizeEvent : public Event {
 	public:
 		WindowResizeEvent(unsigned int width, unsigned int height)

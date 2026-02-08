@@ -5,30 +5,38 @@
 
 namespace Fall {
 
-	class GPUContext;
-	class GPUCommand;
+    class GPUContext;
+    class GPUCommand;
+    class GPURingBuffer;
 
-	class Renderer {
-	public:
-		Renderer(GPUContext& gpu);
-		~Renderer();
+    class Renderer {
+    public:
+        Renderer(GPUContext& gpu);
+        virtual ~Renderer() = default;
 
-		FALL_NON_COPYABLE(Renderer);
+        FALL_NON_COPYABLE(Renderer);
 
-		FrameContext& GetFrame() { return m_Frame; }
+        FrameContext& GetFrame() { return m_Frame; }
 
-		void BeginFrame();
-		void EndFrame();
+        GPURingBuffer& GetUniformRingBuffer() { return *m_UniformRingBuffer; }
+        GPURingBuffer& GetComputeRingBuffer() { return *m_ComputeRingBuffer; }
 
-	private:
-		void ExecuteFrame(FrameContext& frame);
+        void BeginFrame();
+        void EndFrame();
 
-	private:
-		GPUContext& m_GPU;
-		Scope<GPUCommand> m_Command;
+    private:
+        void ExecuteFrame(FrameContext& frame);
 
-		FrameContext m_Frame;
-		uint64_t m_FrameIndex = 0;
-	};
+    private:
+        GPUContext& m_GPU;
+
+        Scope<GPUCommand> m_Command;
+
+        Scope<GPURingBuffer> m_UniformRingBuffer;
+        Scope<GPURingBuffer> m_ComputeRingBuffer;
+
+        FrameContext m_Frame;
+        uint64_t m_FrameIndex = 0;
+    };
 
 }

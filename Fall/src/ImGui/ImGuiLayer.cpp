@@ -17,6 +17,7 @@
 #include "Core/Application.h"
 
 namespace Fall {
+
 	ImGuiLayer::ImGuiLayer() : Layer("ImGuiLayer") {}
 
 	void ImGuiLayer::OnAttach() {

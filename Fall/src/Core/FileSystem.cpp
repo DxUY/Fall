@@ -4,6 +4,7 @@
 #include <fstream>
 
 namespace Fall {
+
     Buffer FileSystem::ReadFileBinary(const std::string& filepath) {
         std::ifstream stream(filepath, std::ios::binary | std::ios::ate);
 

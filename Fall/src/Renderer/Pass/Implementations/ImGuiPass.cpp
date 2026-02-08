@@ -12,6 +12,7 @@
 #include <imgui_impl_sdlgpu3.h> 
 
 namespace Fall {
+
     void ImGuiPass::Execute(GPUCommand& cmd, const FrameContext& frame) {
         F_PROFILE_FUNCTION();
 

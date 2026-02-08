@@ -4,6 +4,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 namespace Fall {
+
     OrthographicCamera::OrthographicCamera(float left, float right, float bottom, float top, float nearP, float farP) {
         m_Projection = glm::ortho(left, right, bottom, top, nearP, farP);
 
