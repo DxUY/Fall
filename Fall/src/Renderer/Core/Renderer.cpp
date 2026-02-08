@@ -22,15 +22,19 @@ namespace Fall {
         m_Frame.Reset(++m_FrameIndex);
         m_Command->Begin();
 
+        m_Frame.SetCommand(m_Command.get());
+
         m_UniformRingBuffer->Reset();
         m_ComputeRingBuffer->Reset();
 
         BackbufferView bb = m_GPU.AcquireBackbuffer(m_Command->GetNative());
 
-        if (!bb.IsValid()) return;
+        if (!bb.IsValid()) {
+            m_Command->End();
+            return;
+        }
 
         m_Frame.SetBackbuffer(bb);
-        m_Frame.SetCommand(m_Command.get());
     }
 
     void Renderer::EndFrame() {

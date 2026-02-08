@@ -52,13 +52,18 @@ namespace Fall {
                     if (nativePipeline) {
                         pass.BindPipeline(nativePipeline);
                         lastKey = &item.pipelineKey;
+                        lastTexture = nullptr;
                     }
                     else continue;
                 }
 
-                if (item.textureCount > 0) {
+                if (item.textureCount > 0 && item.fragmentTextures[0]) {
                     if (item.fragmentTextures[0] != lastTexture) {
-                        pass.BindFragmentSamplers(0, (GPUTexture**)item.fragmentTextures, item.textureCount);
+                        uint32_t bindCount = (item.textureCount > RenderItem::MAX_TEXTURE_SLOTS)
+                            ? RenderItem::MAX_TEXTURE_SLOTS
+                            : item.textureCount;
+
+                        pass.BindFragmentSamplers(0, (GPUTexture**)item.fragmentTextures, bindCount);
                         lastTexture = item.fragmentTextures[0];
                     }
                 }

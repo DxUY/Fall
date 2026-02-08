@@ -24,19 +24,21 @@ namespace Fall {
     }
 
     void GPURenderPass::BindVertexBuffers(uint32_t firstBinding, const std::vector<GPUBuffer*>& buffers, const std::vector<uint32_t>& offsets) {
+        if (buffers.empty()) return;
+
+        for (auto* buf : buffers) {
+            FALL_CORE_ASSERT(buf && buf->GetNative(), "Attempting to bind a null or uninitialized vertex buffer!");
+        }
+
         std::vector<SDL_GPUBufferBinding> bindings;
         bindings.reserve(buffers.size());
 
         for (size_t i = 0; i < buffers.size(); ++i) {
-            if (buffers[i] && buffers[i]->GetNative()) {
-                uint32_t offset = (i < offsets.size()) ? offsets[i] : 0;
-                bindings.push_back({ buffers[i]->GetNative(), offset });
-            }
+            uint32_t offset = (i < offsets.size()) ? offsets[i] : 0;
+            bindings.push_back({ buffers[i]->GetNative(), offset });
         }
 
-        if (!bindings.empty()) {
-            SDL_BindGPUVertexBuffers(m_Pass, firstBinding, bindings.data(), (uint32_t)bindings.size());
-        }
+        SDL_BindGPUVertexBuffers(m_Pass, firstBinding, bindings.data(), (uint32_t)bindings.size());
     }
 
     void GPURenderPass::BindIndexBuffer(GPUBuffer* buffer, uint32_t offset, IndexElementSize indexSize) {

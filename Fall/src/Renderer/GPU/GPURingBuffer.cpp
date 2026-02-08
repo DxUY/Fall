@@ -20,22 +20,25 @@ namespace Fall {
     GPURingBuffer::GPURingBuffer(GPUContext& context, uint32_t totalSize, BufferUsage usage)
         : m_Context(context), m_TotalSize(totalSize) {
 
-        BufferDesc desc{};
-        desc.size = totalSize;
-        desc.usage = usage;
+        BufferDesc desc{ totalSize, usage };
         m_BackingBuffer = CreateScope<GPUBuffer>(m_Context, desc);
 
         SDL_GPUTransferBufferCreateInfo xferInfo{};
         xferInfo.size = totalSize;
         xferInfo.usage = SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD;
+
         m_TransferBuffer = SDL_CreateGPUTransferBuffer(m_Context.GetDevice(), &xferInfo);
+        FALL_CORE_ASSERT(m_TransferBuffer, "Failed to create Ring Buffer Transfer hardware!");
 
         m_MappedData = (uint8_t*)SDL_MapGPUTransferBuffer(m_Context.GetDevice(), m_TransferBuffer, false);
+        FALL_CORE_ASSERT(m_MappedData, "Failed to map Ring Buffer Transfer memory!");
     }
 
     GPURingBuffer::~GPURingBuffer() {
         if (m_TransferBuffer) {
-            SDL_UnmapGPUTransferBuffer(m_Context.GetDevice(), m_TransferBuffer);
+            if (m_MappedData) {
+                SDL_UnmapGPUTransferBuffer(m_Context.GetDevice(), m_TransferBuffer);
+            }
             SDL_ReleaseGPUTransferBuffer(m_Context.GetDevice(), m_TransferBuffer);
         }
     }
@@ -43,9 +46,17 @@ namespace Fall {
     uint32_t GPURingBuffer::Push(GPUCommand& cmd, const void* data, uint32_t size) {
         FALL_ASSERT_GPU_THREAD();
 
-        m_CurrentOffset = (m_CurrentOffset + (ALIGNMENT - 1)) & ~(ALIGNMENT - 1);
-        FALL_ASSERT(m_CurrentOffset + size <= m_TotalSize, "Ring Buffer Overflow!");
+        if (!m_MappedData || size == 0) return 0;
 
+        uint32_t alignedOffset = (m_CurrentOffset + (ALIGNMENT - 1)) & ~(ALIGNMENT - 1);
+
+        if (alignedOffset + size > m_TotalSize) {
+            FALL_CORE_ERROR("GPURingBuffer Overflow! Increase buffer size.");
+            FALL_ASSERT(false, "Ring Buffer Overflow!");
+            return 0;
+        }
+
+        m_CurrentOffset = alignedOffset;
         uint32_t writeOffset = m_CurrentOffset;
 
         memcpy(m_MappedData + writeOffset, data, size);

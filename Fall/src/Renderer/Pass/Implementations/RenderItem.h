@@ -8,13 +8,13 @@ namespace Fall {
     class GPUBuffer;
     class GPUTexture;
 
-    static constexpr uint32_t MAX_TEXTURE_SLOTS = 4;
-
     struct RenderItem {
+        static constexpr uint32_t MAX_TEXTURE_SLOTS = 4;
+
         GPUBuffer* vertexBuffer = nullptr;
         GPUBuffer* indexBuffer = nullptr;
 
-        GPUTexture* fragmentTextures[MAX_TEXTURE_SLOTS]{ nullptr };
+        GPUTexture* fragmentTextures[MAX_TEXTURE_SLOTS]{ nullptr, nullptr, nullptr, nullptr };
 
         PipelineKey pipelineKey;
 
@@ -28,6 +28,7 @@ namespace Fall {
         uint32_t textureCount = 0;
         bool indexed = false;
 
-        uint8_t _padding[3]{ 0 };
+        uint8_t _padding[3]{ 0, 0, 0 };
     };
+
 }
