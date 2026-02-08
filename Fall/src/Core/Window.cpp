@@ -5,8 +5,8 @@
 #include "Sdl/SdlWindow.h"
 #endif
 
-namespace Fall
-{
+namespace Fall {
+
 	Scope<Window> Window::Create(const WindowProps& props)
 	{
 #ifdef FALL_PLATFORM_WINDOWS

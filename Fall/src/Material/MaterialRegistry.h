@@ -1,10 +1,13 @@
 #pragma once
+
 #include "MaterialCommon.h"
+
 #include <vector>
 #include <string>
 #include <unordered_map>
 
 namespace Fall {
+
     class MaterialRegistry {
     public:
         static MaterialRegistry& Get() { static MaterialRegistry instance; return instance; }

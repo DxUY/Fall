@@ -7,8 +7,7 @@
 
 extern Fall::Application* Fall::CreateApplication();
 
-int main(int argc, char** argv)
-{
+int main(int argc, char** argv) {
     Fall::Log::Init();
 
     auto app = Fall::CreateApplication();

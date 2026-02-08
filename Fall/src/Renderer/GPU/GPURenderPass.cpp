@@ -16,76 +16,73 @@ namespace Fall {
         const auto* colorInfo = static_cast<const SDL_GPUColorTargetInfo*>(target.GetNativeInfo());
 
         m_Pass = SDL_BeginGPURenderPass(cmd.GetNative(), colorInfo, 1, nullptr);
-        FALL_CORE_ASSERT(m_Pass, "Failed to begin GPU render pass: {0}", SDL_GetError());
+        FALL_CORE_ASSERT(m_Pass, "Failed to begin GPU render pass");
     }
 
     void GPURenderPass::BindPipeline(SDL_GPUGraphicsPipeline* pipeline) {
-        if (pipeline) {
-            SDL_BindGPUGraphicsPipeline(m_Pass, pipeline);
-        }
+        if (pipeline) SDL_BindGPUGraphicsPipeline(m_Pass, pipeline);
     }
 
-    void GPURenderPass::BindVertexBuffers(uint32_t firstBinding, const std::vector<GPUBuffer*>& buffers) {
+    void GPURenderPass::BindVertexBuffers(uint32_t firstBinding, const std::vector<GPUBuffer*>& buffers, const std::vector<uint32_t>& offsets) {
+        if (buffers.empty()) return;
+
+        for (auto* buf : buffers) {
+            FALL_CORE_ASSERT(buf && buf->GetNative(), "Attempting to bind a null or uninitialized vertex buffer!");
+        }
+
         std::vector<SDL_GPUBufferBinding> bindings;
         bindings.reserve(buffers.size());
 
-        for (auto* buffer : buffers) {
-            if (buffer && buffer->GetNative()) {
-                bindings.push_back(SDL_GPUBufferBinding{ buffer->GetNative(), 0 });
-            }
+        for (size_t i = 0; i < buffers.size(); ++i) {
+            uint32_t offset = (i < offsets.size()) ? offsets[i] : 0;
+            bindings.push_back({ buffers[i]->GetNative(), offset });
         }
 
-        if (!bindings.empty()) {
-            SDL_BindGPUVertexBuffers(m_Pass, firstBinding, bindings.data(), static_cast<uint32_t>(bindings.size()));
-        }
+        SDL_BindGPUVertexBuffers(m_Pass, firstBinding, bindings.data(), (uint32_t)bindings.size());
     }
 
-    void GPURenderPass::BindIndexBuffer(GPUBuffer* buffer, IndexElementSize indexSize) {
+    void GPURenderPass::BindIndexBuffer(GPUBuffer* buffer, uint32_t offset, IndexElementSize indexSize) {
         if (buffer && buffer->GetNative()) {
             SDL_GPUIndexElementSize size = (indexSize == IndexElementSize::ThirtyTwoBit)
                 ? SDL_GPU_INDEXELEMENTSIZE_32BIT : SDL_GPU_INDEXELEMENTSIZE_16BIT;
 
-            SDL_GPUBufferBinding binding = { buffer->GetNative(), 0 };
+            SDL_GPUBufferBinding binding = { buffer->GetNative(), offset };
             SDL_BindGPUIndexBuffer(m_Pass, &binding, size);
         }
     }
 
-    void GPURenderPass::BindVertexSamplers(uint32_t firstSlot, const std::vector<GPUTexture*>& textures) {
-        std::vector<SDL_GPUTextureSamplerBinding> bindings;
-        bindings.reserve(textures.size());
+    void GPURenderPass::BindVertexSamplers(uint32_t firstSlot, GPUTexture** textures, uint32_t count) {
+        if (count == 0 || !textures) return;
 
-        for (auto* tex : textures) {
-            if (tex && tex->GetNative()) {
-                bindings.push_back(SDL_GPUTextureSamplerBinding{ tex->GetNative(), nullptr });
-            }
-        }
+        FALL_CORE_ASSERT(count <= 8, "BindVertexSamplers: count ({0}) exceeds limit of 8 at slot {1}!", count, firstSlot);
 
-        if (!bindings.empty()) {
-            SDL_BindGPUVertexSamplers(m_Pass, firstSlot, bindings.data(), static_cast<uint32_t>(bindings.size()));
+        SDL_GPUTextureSamplerBinding b[8];
+        uint32_t c = (count > 8) ? 8 : count;
+        for (uint32_t i = 0; i < c; ++i) {
+            b[i] = { textures[i] ? textures[i]->GetNative() : nullptr, nullptr };
         }
+        SDL_BindGPUVertexSamplers(m_Pass, firstSlot, b, c);
     }
 
-    void GPURenderPass::BindFragmentSamplers(uint32_t firstSlot, const std::vector<GPUTexture*>& textures) {
-        std::vector<SDL_GPUTextureSamplerBinding> bindings;
-        bindings.reserve(textures.size());
+    void GPURenderPass::BindFragmentSamplers(uint32_t firstSlot, GPUTexture** textures, uint32_t count) {
+        if (count == 0 || !textures) return;
+        
+        FALL_CORE_ASSERT(count <= 8, "BindFragmentSamplers: count ({0}) exceeds limit of 8 at slot {1}!", count, firstSlot);
 
-        for (auto* tex : textures) {
-            if (tex && tex->GetNative()) {
-                bindings.push_back(SDL_GPUTextureSamplerBinding{ tex->GetNative(), nullptr });
-            }
+        SDL_GPUTextureSamplerBinding b[8];
+        uint32_t c = (count > 8) ? 8 : count;
+        for (uint32_t i = 0; i < c; ++i) {
+            b[i] = { textures[i] ? textures[i]->GetNative() : nullptr, nullptr };
         }
-
-        if (!bindings.empty()) {
-            SDL_BindGPUFragmentSamplers(m_Pass, firstSlot, bindings.data(), static_cast<uint32_t>(bindings.size()));
-        }
+        SDL_BindGPUFragmentSamplers(m_Pass, firstSlot, b, c);
     }
 
-    void GPURenderPass::Draw(uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance) {
-        SDL_DrawGPUPrimitives(m_Pass, vertexCount, instanceCount, firstVertex, firstInstance);
+    void GPURenderPass::Draw(uint32_t vCount, uint32_t iCount, uint32_t fV, uint32_t fI) {
+        SDL_DrawGPUPrimitives(m_Pass, vCount, iCount, fV, fI);
     }
 
-    void GPURenderPass::DrawIndexed(uint32_t indexCount, uint32_t instanceCount, uint32_t firstIndex, uint32_t vertexOffset, uint32_t firstInstance) {
-        SDL_DrawGPUIndexedPrimitives(m_Pass, indexCount, instanceCount, firstIndex, vertexOffset, firstInstance);
+    void GPURenderPass::DrawIndexed(uint32_t idxCount, uint32_t instCount, uint32_t fIdx, uint32_t vOff, uint32_t fInst) {
+        SDL_DrawGPUIndexedPrimitives(m_Pass, idxCount, instCount, fIdx, vOff, fInst);
     }
 
     GPURenderPass::~GPURenderPass() {

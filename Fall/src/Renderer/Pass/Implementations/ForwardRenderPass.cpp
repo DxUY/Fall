@@ -2,7 +2,6 @@
 #include "ForwardRenderPass.h"
 
 #include "Renderer/Core/FrameContext.h"
-
 #include "Renderer/GPU/GPUCommand.h"
 #include "Renderer/GPU/GPURenderPass.h"
 #include "Renderer/GPU/GPURenderTarget.h"
@@ -14,7 +13,8 @@
 namespace Fall {
 
     ForwardRenderPass::ForwardRenderPass(PipelineManager& pipelineMgr)
-        : m_PipelineMgr(pipelineMgr) {}
+        : m_PipelineMgr(pipelineMgr) {
+    }
 
     void ForwardRenderPass::Submit(const RenderItem& item) {
         FALL_ASSERT_GPU_THREAD();
@@ -30,10 +30,12 @@ namespace Fall {
             if (!(a.pipelineKey == b.pipelineKey)) {
                 return a.pipelineKey < b.pipelineKey;
             }
-            auto* texA = a.fragmentTextures.empty() ? nullptr : a.fragmentTextures[0];
-            auto* texB = b.fragmentTextures.empty() ? nullptr : b.fragmentTextures[0];
-            return texA < texB;
-            });
+
+            auto* texA = (a.textureCount > 0) ? a.fragmentTextures[0] : nullptr;
+            auto* texB = (b.textureCount > 0) ? b.fragmentTextures[0] : nullptr;
+
+            return std::less<GPUTexture*>{}(texA, texB);
+        });
 
         const auto& backbuffer = frame.GetBackbuffer();
         if (!backbuffer.IsValid()) return;
@@ -51,22 +53,28 @@ namespace Fall {
                     if (nativePipeline) {
                         pass.BindPipeline(nativePipeline);
                         lastKey = &item.pipelineKey;
+                        lastTexture = nullptr;
                     }
-                    else continue; 
+                    else continue;
                 }
 
-                if (!item.fragmentTextures.empty()) {
+                if (item.textureCount > 0 && item.fragmentTextures[0]) {
                     if (item.fragmentTextures[0] != lastTexture) {
-                        pass.BindFragmentSamplers(0, item.fragmentTextures);
+                        uint32_t bindCount = (item.textureCount > RenderItem::MAX_TEXTURE_SLOTS)
+                            ? RenderItem::MAX_TEXTURE_SLOTS
+                            : item.textureCount;
+
+                        pass.BindFragmentSamplers(0, (GPUTexture**)item.fragmentTextures, bindCount);
                         lastTexture = item.fragmentTextures[0];
                     }
                 }
 
-                if (item.vertexBuffer)
-                    pass.BindVertexBuffers(0, { item.vertexBuffer });
+                if (item.vertexBuffer) {
+                    pass.BindVertexBuffers(0, { item.vertexBuffer }, { item.vertexBufferOffset });
+                }
 
                 if (item.indexed && item.indexBuffer) {
-                    pass.BindIndexBuffer(item.indexBuffer, IndexElementSize::ThirtyTwoBit);
+                    pass.BindIndexBuffer(item.indexBuffer, item.indexBufferOffset, IndexElementSize::ThirtyTwoBit);
                     pass.DrawIndexed(item.elementCount, item.instanceCount, item.firstIndex, item.vertexOffset);
                 }
                 else {

@@ -3,6 +3,7 @@
 #include <glm/glm.hpp>
 
 namespace Fall {
+
     class Camera {
     public:
         Camera() = default;

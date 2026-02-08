@@ -9,10 +9,7 @@ namespace Fall {
 	public:
 		virtual ~Pass() = default;
 
-		virtual void Execute(
-			GPUCommand& cmd,
-			const FrameContext& frame
-		) = 0;
+		virtual void Execute(GPUCommand& cmd, const FrameContext& frame) = 0;
 	};
 
 }

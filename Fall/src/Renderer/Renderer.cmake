@@ -16,6 +16,7 @@ target_sources(Fall PRIVATE
 	src/Renderer/GPU/GPUGraphicsPipeline.cpp
 	src/Renderer/GPU/GPURenderPass.cpp
 	src/Renderer/GPU/GPURenderTarget.cpp
+	src/Renderer/GPU/GPURingBuffer.cpp
 	src/Renderer/GPU/GPUShader.cpp
 	src/Renderer/GPU/GPUTexture.cpp
 	src/Renderer/GPU/GPUUtils.cpp

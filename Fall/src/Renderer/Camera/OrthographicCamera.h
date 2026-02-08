@@ -4,6 +4,7 @@
 #include <glm/glm.hpp>
 
 namespace Fall {
+
     class OrthographicCamera : public Camera {
     public:
         OrthographicCamera(float left, float right, float bottom, float top, float nearP = -1.0f, float farP = 1.0f);
