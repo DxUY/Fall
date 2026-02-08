@@ -53,6 +53,9 @@ namespace Fall {
 
     void GPURenderPass::BindVertexSamplers(uint32_t firstSlot, GPUTexture** textures, uint32_t count) {
         if (count == 0 || !textures) return;
+
+        FALL_CORE_ASSERT(count <= 8, "BindVertexSamplers: count ({0}) exceeds limit of 8 at slot {1}!", count, firstSlot);
+
         SDL_GPUTextureSamplerBinding b[8];
         uint32_t c = (count > 8) ? 8 : count;
         for (uint32_t i = 0; i < c; ++i) {
@@ -63,6 +66,9 @@ namespace Fall {
 
     void GPURenderPass::BindFragmentSamplers(uint32_t firstSlot, GPUTexture** textures, uint32_t count) {
         if (count == 0 || !textures) return;
+        
+        FALL_CORE_ASSERT(count <= 8, "BindFragmentSamplers: count ({0}) exceeds limit of 8 at slot {1}!", count, firstSlot);
+
         SDL_GPUTextureSamplerBinding b[8];
         uint32_t c = (count > 8) ? 8 : count;
         for (uint32_t i = 0; i < c; ++i) {
